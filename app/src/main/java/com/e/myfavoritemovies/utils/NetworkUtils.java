@@ -26,10 +26,11 @@ public class NetworkUtils {
      * @param movieType either popular or top rated
      * @return a url for the popular or top rated movies
      */
-    public static URL buildUrl(String movieType){
+    public static URL buildUrl(String movieType,int page){
 
         Uri builtUri = Uri.parse(BASE_URL).buildUpon().appendPath(movieType)
-                .appendQueryParameter(API_KEY_NAME,API_KEY_VALUE).build();
+                .appendQueryParameter(API_KEY_NAME,API_KEY_VALUE).
+                        appendQueryParameter("page",String.valueOf(page)).build();
 
         URL url=null;
 

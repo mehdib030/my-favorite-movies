@@ -1,5 +1,7 @@
 package com.e.myfavoritemovies.model;
 
+import java.io.Serializable;
+
 /**
  * This class represents a movie object model
  * original title
@@ -8,7 +10,7 @@ package com.e.myfavoritemovies.model;
  * user rating (called vote_average in the api)
  * release date
  */
-public class Movie {
+public class Movie implements Serializable {
     private String originalTitle;
     private String image;
     private String plotSynopsis;
@@ -64,8 +66,5 @@ public class Movie {
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
-
-
-
 
 }

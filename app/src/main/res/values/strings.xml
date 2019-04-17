@@ -1,16 +1,3 @@
 <resources>
-    <string name="app_name">MyFavoriteMovies</string>
-
-    <string-array name="movie_names">
-        <item>Ham and cheese sandwich</item>
-        <item>Bosna</item>
-        <item>Chivito</item>
-        <item>Club sandwich</item>
-        <item>Gua bao</item>
-        <item>Medianoche</item>
-        <item>Pljeskavica</item>
-        <item>Roujiamo</item>
-        <item>Shawarma</item>
-        <item>Vada Pav</item>
-    </string-array>
+    <string name="app_name">My Favorite Movies</string>
 </resources>

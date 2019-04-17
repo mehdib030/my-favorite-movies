@@ -59,11 +59,11 @@ public class JsonUtils {
 
         }
 
-        int totalResults = movieJson.getInt(MOVIE_TOTAL_RESULTS);
-
-        parsedMovieTitles = new Movie[totalResults];
+        //int totalResults = movieJson.getInt(MOVIE_TOTAL_RESULTS);
 
         JSONArray movieArray = movieJson.getJSONArray(MOVIE_RESULTS);
+
+        parsedMovieTitles = new Movie[movieArray.length()];
 
         if(movieArray != null){
 
@@ -96,7 +96,7 @@ public class JsonUtils {
             movie.setOriginalTitle(jsonMovie.getString(MOVIE_ORIGINAL_TITLE));
             movie.setPlotSynopsis(jsonMovie.getString(MOVIE_OVERVIEW));
             movie.setRating(jsonMovie.getString(MOVIE_RATING));
-            movie.setReleaseDate(jsonMovie.getString(MOVIE_RELEASE_DATE));
+            movie.setReleaseDate(DateUtils.formatDate(jsonMovie.getString(MOVIE_RELEASE_DATE)));
         } catch (JSONException e) {
             e.printStackTrace();
         }

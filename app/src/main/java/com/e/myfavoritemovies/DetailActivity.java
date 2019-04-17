@@ -3,14 +3,22 @@ package com.e.myfavoritemovies;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.e.myfavoritemovies.model.Movie;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "extra_position";
     private static final int DEFAULT_POSITION = -1;
+
+    private static final String BASE_URL="http://image.tmdb.org/t/p/w185//";
 
     private ImageView mMovieImageView;
     private TextView mOriginalTitleTextView;
@@ -43,7 +51,23 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
+        ArrayList<Movie> movies = (ArrayList<Movie>) intent.getSerializableExtra("movies");
 
+        Movie movie = movies.get(position);
+
+        populateUI(movie);
+        Picasso.get().load(BASE_URL +movie.getImage()).into(mMovieImageView);
+    }
+
+    /**
+     * This method populates the ui
+     * @param movie
+     */
+    private void populateUI(Movie movie){
+        mOriginalTitleTextView.setText(movie.getOriginalTitle());
+        mPlotSynopsisTextView.setText(movie.getPlotSynopsis());
+        mRatingTextView.setText(movie.getRating());
+        mReleaseDateTextView.setText(movie.getReleaseDate());
     }
 
     private void closeOnError(){
