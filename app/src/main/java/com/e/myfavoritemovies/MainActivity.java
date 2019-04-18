@@ -109,8 +109,9 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         return true;
     }
 
-
-
+    /**
+     * Async task to load the data
+     */
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         @Override
@@ -129,10 +130,8 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                         Log.i(TAG, "Empty Results.");
                     }
             } catch (IOException e) {
-                e.printStackTrace();
                 return null;
             } catch (JSONException e) {
-                e.printStackTrace();
                 return null;
             }
             Movie[] movies = new Movie[movieList.size()];
@@ -144,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
                 RecyclerView recyclerView = findViewById(R.id.movies_recylerview);
 
-                final GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,4);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,4);
 
                 recyclerView.setLayoutManager(gridLayoutManager);
 
