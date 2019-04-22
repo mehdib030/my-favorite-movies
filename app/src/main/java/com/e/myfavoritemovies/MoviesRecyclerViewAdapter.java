@@ -1,7 +1,9 @@
 package com.e.myfavoritemovies;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,13 +24,52 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     private LayoutInflater mLayoutInflater;
     private ItemClickListener mItemClickListener;
 
+    // The minimum amount of items to have below your current scroll position
+    // before loading more.
+    private int visibleThreshold = 5;
+    private int lastVisibleItem, totalItemCount;
+    private boolean loading;
+    private OnLoadMoreListener onLoadMoreListener;
 
-    public MoviesRecyclerViewAdapter(Context context, Movie[] movies,int numberOfItems){
+
+    public MoviesRecyclerViewAdapter(Context context, Movie[] movies,int numberOfItems, RecyclerView recyclerView){
           this.mLayoutInflater =  LayoutInflater.from(context);
           this.movies=movies;
           this.mNumberOfItems=numberOfItems;
-    }
 
+            if(recyclerView.getLayoutManager() instanceof GridLayoutManager){
+
+                final GridLayoutManager gridLayoutManager = (GridLayoutManager)recyclerView.getLayoutManager();
+
+                recyclerView
+                        .addOnScrollListener(new RecyclerView.OnScrollListener() {
+                            @Override
+                            public void onScrolled(RecyclerView recyclerView,
+                                                   int dx, int dy) {
+                                super.onScrolled(recyclerView, dx, dy);
+
+                                totalItemCount = gridLayoutManager.getItemCount();
+                                lastVisibleItem = gridLayoutManager
+                                        .findLastVisibleItemPosition();
+                                if (!loading
+                                        && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                                    // End has been reached
+                                    // Do something
+                                    if (onLoadMoreListener != null) {
+                                        onLoadMoreListener.onLoadMore();
+                                    }
+                                    loading = true;
+                                }
+                            }
+                        });
+            }
+
+        }
+
+
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        this.onLoadMoreListener = onLoadMoreListener;
+    }
 
     @NonNull
     @Override
@@ -45,6 +86,10 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         if (movie != null) {
             Picasso.get().load(BASE_URL + movie.getImage()).into(holder.mMovieImageView);
         }
+    }
+
+    public void setLoaded() {
+        loading = false;
     }
 
     @Override

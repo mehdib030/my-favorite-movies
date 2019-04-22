@@ -2,6 +2,7 @@ package com.e.myfavoritemovies;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -41,10 +42,15 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     private String movieSort;
 
+    protected Handler handler;
+
+    public static int pageNumber;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        handler = new Handler();
     }
 
     private void launchDetailActivity(int position) {
@@ -95,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                             movieSort = TOP_RATED_MOVIES;
                             break;
                     }
+                    ++pageNumber;
                     loadMoviesData();
                 }
             }
@@ -121,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
             movieList= new ArrayList();
 
             try {
-                    URL url = NetworkUtils.buildUrl(movieSort,1);
+                    URL url = NetworkUtils.buildUrl(movieSort,pageNumber);
                     try {
                         String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
                         movieList.addAll(
@@ -147,9 +154,39 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
                 recyclerView.setLayoutManager(gridLayoutManager);
 
-                adapter = new MoviesRecyclerViewAdapter(MainActivity.this,moviesData,moviesData.length);
+                adapter = new MoviesRecyclerViewAdapter(MainActivity.this,moviesData,moviesData.length,recyclerView);
 
                 adapter.setClickListener(MainActivity.this);
+
+                adapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+                    @Override
+                    public void onLoadMore() {
+                        //add null , so the adapter will check view_type and show progress bar at bottom
+                        movieList.add(null);
+                        adapter.notifyItemInserted(movieList.size() - 1);
+                        ++pageNumber;
+
+
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                movieList.remove(movieList.size() - 1);
+                                adapter.notifyItemRemoved(movieList.size());
+                                //adapter.notifyItemInserted(movieList.size());
+
+                                loadMoviesData();
+
+                                adapter.notifyDataSetChanged();
+                                adapter.setLoaded();
+                            }
+                        },2000);
+                        //loadMoviesData();
+
+
+                    }
+                });
+
 
                 recyclerView.setAdapter(adapter);
             }
