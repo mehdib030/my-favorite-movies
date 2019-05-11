@@ -15,18 +15,18 @@ import com.squareup.picasso.Picasso;
  */
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.ViewHolder> {
 
-    private static final String BASE_URL="http://image.tmdb.org/t/p/w185//";
-
     private int mNumberOfItems;
     private Movie[] movies;
     private LayoutInflater mLayoutInflater;
     private ItemClickListener mItemClickListener;
+    private Context context;
 
 
     public MoviesRecyclerViewAdapter(Context context, Movie[] movies,int numberOfItems){
           this.mLayoutInflater =  LayoutInflater.from(context);
           this.movies=movies;
           this.mNumberOfItems=numberOfItems;
+          this.context=context;
     }
 
 
@@ -43,7 +43,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         Movie movie = movies[position];
 
         if (movie != null) {
-            Picasso.get().load(BASE_URL + movie.getImage()).into(holder.mMovieImageView);
+            Picasso.get().load(this.context.getString(R.string.image_base_url)+ movie.getImage()).into(holder.mMovieImageView);
         }
     }
 

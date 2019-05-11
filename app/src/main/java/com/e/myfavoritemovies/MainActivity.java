@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         MenuItem item = menu.findItem(R.id.spinner_item);
         Spinner spinner = (Spinner) item.getActionView();
 
-
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,sort);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -110,17 +109,18 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     }
 
 
-
+    /**
+     * This async task retrieves the movie list
+     */
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         @Override
         protected Movie[] doInBackground(String... params) {
 
-
             movieList= new ArrayList();
 
             try {
-                    URL url = NetworkUtils.buildUrl(movieSort,1);
+                    URL url = NetworkUtils.buildUrl(MainActivity.this,movieSort,1); //TODO: add lazy loading scrolling for real life scenario
                     try {
                         String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
                         movieList.addAll(
@@ -129,10 +129,8 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                         Log.i(TAG, "Empty Results.");
                     }
             } catch (IOException e) {
-                e.printStackTrace();
                 return null;
             } catch (JSONException e) {
-                e.printStackTrace();
                 return null;
             }
             Movie[] movies = new Movie[movieList.size()];

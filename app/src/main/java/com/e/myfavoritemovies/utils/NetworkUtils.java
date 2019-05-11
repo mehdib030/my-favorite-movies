@@ -1,7 +1,10 @@
 package com.e.myfavoritemovies.utils;
 
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+
+import com.e.myfavoritemovies.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,9 +17,9 @@ public class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
-    private static final String BASE_URL = "http://api.themoviedb.org/3/movie/"; //TODO: move to properties file
+   // private static final String BASE_URL = "http://api.themoviedb.org/3/movie/"; //TODO: move to properties file
 
-    private static final String API_KEY_VALUE = "2830d7b62b683f28c1c092afbea0196e"; //TODO:move to properties file
+    //private static final String API_KEY_VALUE = "2830d7b62b683f28c1c092afbea0196e"; //TODO:move to properties file
 
     private static final String API_KEY_NAME="api_key";
 
@@ -26,10 +29,10 @@ public class NetworkUtils {
      * @param movieType either popular or top rated
      * @return a url for the popular or top rated movies
      */
-    public static URL buildUrl(String movieType,int page){
+    public static URL buildUrl(Context context, String movieType, int page){
 
-        Uri builtUri = Uri.parse(BASE_URL).buildUpon().appendPath(movieType)
-                .appendQueryParameter(API_KEY_NAME,API_KEY_VALUE).
+        Uri builtUri = Uri.parse(context.getString(R.string.base_url)).buildUpon().appendPath(movieType)
+                .appendQueryParameter(API_KEY_NAME,context.getString(R.string.api_key_value)).
                         appendQueryParameter("page",String.valueOf(page)).build();
 
         URL url=null;
