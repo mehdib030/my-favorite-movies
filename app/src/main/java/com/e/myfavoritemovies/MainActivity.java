@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.e.myfavoritemovies.Database.AppDatabase;
+import com.e.myfavoritemovies.Database.FavoriteMovieEntry;
 import com.e.myfavoritemovies.model.Movie;
 import com.e.myfavoritemovies.utils.JsonUtils;
 import com.e.myfavoritemovies.utils.NetworkUtils;
@@ -32,19 +36,24 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     private static final String POPULAR_MOVIES="popular";
     private static final String TOP_RATED_MOVIES="top_rated";
+    private static final String FAVORITES = "favorites";
 
     private MoviesRecyclerViewAdapter adapter;
 
     private List<Movie> movieList;
 
-    private String[] sort = {"Popular","Top Rated"};
+    private String[] sort = {"Popular","Top Rated","Favorites"};
 
-    private String movieSort;
+    private String movieType;
+
+    private AppDatabase fmdb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fmdb = AppDatabase.getInstance(getApplicationContext());
     }
 
     private void launchDetailActivity(int position) {
@@ -88,11 +97,14 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
                     switch(item.toString()) {
                         case "Popular":
-                            movieSort = POPULAR_MOVIES;
+                            movieType = POPULAR_MOVIES;
                             break;
                         case "Top Rated":
-                            movieSort = TOP_RATED_MOVIES;
+                            movieType = TOP_RATED_MOVIES;
                             break;
+                        case "Favorites":
+                            movieType =FAVORITES;
+
                     }
                     loadMoviesData();
                 }
@@ -120,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
             movieList= new ArrayList();
 
             try {
-                    URL url = NetworkUtils.buildUrl(MainActivity.this,movieSort,1); //TODO: add lazy loading scrolling for real life scenario
+                    URL url = NetworkUtils.buildUrl(MainActivity.this,movieType,1); //TODO: add lazy loading scrolling for real life scenario
                     try {
                         String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
                         movieList.addAll(
@@ -153,5 +165,12 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                 recyclerView.setAdapter(adapter);
             }
         }
+
+    }
+
+    public void loadFavoriteMovies(){
+        List<FavoriteMovieEntry> favoriteMovies = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+
+
     }
 }

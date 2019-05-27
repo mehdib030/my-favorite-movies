@@ -15,6 +15,8 @@ import java.util.List;
 
 public class JsonUtils {
 
+    private static final String MOVIE_ID="id";
+
     private static final String MOVIE_POSTER="poster_path";
 
     private static final String MOVIE_RATING="vote_average";
@@ -59,8 +61,6 @@ public class JsonUtils {
 
         }
 
-        //int totalResults = movieJson.getInt(MOVIE_TOTAL_RESULTS);
-
         JSONArray movieArray = movieJson.getJSONArray(MOVIE_RESULTS);
 
         parsedMovieTitles = new Movie[movieArray.length()];
@@ -75,13 +75,6 @@ public class JsonUtils {
 
                 parsedMovieTitles[i]=movie;
 
-
-               /* String originalTitle = movie.getString(MOVIE_ORIGINAL_TITLE);
-                if(originalTitle == null){
-                    parsedMovieTitles[i]="";
-                } else {
-                    parsedMovieTitles[i]=originalTitle;
-                }*/
             }
         }
 
@@ -92,6 +85,7 @@ public class JsonUtils {
         Movie movie = new Movie();
 
         try {
+            movie.setId(jsonMovie.getString(MOVIE_ID));
             movie.setImage(jsonMovie.getString(MOVIE_POSTER));
             movie.setOriginalTitle(jsonMovie.getString(MOVIE_ORIGINAL_TITLE));
             movie.setPlotSynopsis(jsonMovie.getString(MOVIE_OVERVIEW));
@@ -101,31 +95,6 @@ public class JsonUtils {
             e.printStackTrace();
         }
 
-        return movie;
-    }
-
-    /**
-     * Parses the json movie string
-     * @param json
-     * @return a Movie object
-     */
-    public static Movie parseMovieJson(String json) {
-        Movie movie = new Movie();
-
-       /* try {
-            JSONObject sandwichJson = new JSONObject(json);
-            JSONObject name = sandwichJson.getJSONObject("name");
-            sandwich.setMainName(name.getString("mainName"));
-            JSONArray alsoKnownAsArray = name.getJSONArray("alsoKnownAs");
-            sandwich.setAlsoKnownAs(convertJSONArrayToList(alsoKnownAsArray));
-            sandwich.setDescription(sandwichJson.getString("description"));
-            sandwich.setImage(sandwichJson.getString("image"));
-            sandwich.setIngredients(convertJSONArrayToList(sandwichJson.getJSONArray("ingredients")));
-            sandwich.setPlaceOfOrigin(sandwichJson.getString("placeOfOrigin"));
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
         return movie;
     }
 
@@ -149,13 +118,4 @@ public class JsonUtils {
         }
         return listdata;
     }
-//
-//    {\"name\":{\"mainName\":\"Ham and cheese
-//        sandwich\",\"alsoKnownAs\":[]},\"placeOfOrigin\":\"\",\"description\":\"A ham and cheese
-//        sandwich is a common type of sandwich. It is made by putting cheese and sliced ham
-//        between two slices of bread. The bread is sometimes buttered and/or toasted. Vegetables
-//        like lettuce, tomato, onion or pickle slices can also be included. Various kinds of
-//        mustard and mayonnaise are also
-//        common.\",\"image\":\"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Grilled_ham_and_cheese_014.JPG/800px-Grilled_ham_and_cheese_014.JPG\",\"ingredients\":[\"Sliced
-//        bread\",\"Cheese\",\"Ham\"]}
 }

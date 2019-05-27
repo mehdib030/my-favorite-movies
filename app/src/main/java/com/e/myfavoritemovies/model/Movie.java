@@ -11,6 +11,8 @@ import java.io.Serializable;
  * release date
  */
 public class Movie implements Serializable {
+
+    private String id;
     private String originalTitle;
     private String image;
     private String plotSynopsis;
@@ -19,12 +21,21 @@ public class Movie implements Serializable {
 
     public Movie(){}
 
-    public Movie(String originalTitle, String image, String plotSynopsis, String rating, String releaseDate){
+    public Movie(String id, String originalTitle, String image, String plotSynopsis, String rating, String releaseDate){
+        this.id=id;
         this.originalTitle=originalTitle;
         this.image=image;
         this.plotSynopsis=plotSynopsis;
         this.rating=rating;
         this.releaseDate=releaseDate;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getOriginalTitle() {
