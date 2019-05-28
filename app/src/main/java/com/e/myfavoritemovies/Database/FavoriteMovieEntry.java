@@ -10,16 +10,20 @@ public class FavoriteMovieEntry {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    private String movieId;
+
     private String title;
 
-    public FavoriteMovieEntry(int id, String title){
+    public FavoriteMovieEntry(int id, String title, String movieId){
         this.id=id;
         this.title=title;
+        this.movieId=movieId;
     }
 
     @Ignore
-    public FavoriteMovieEntry(String title){
+    public FavoriteMovieEntry(String title,String movieId){
         this.title=title;
+        this.movieId=movieId;
     }
 
     public String getTitle() {
@@ -38,8 +42,12 @@ public class FavoriteMovieEntry {
         this.id = id;
     }
 
+    public String getMovieId() {
+        return movieId;
+    }
 
-
-
+    public void setMovieId(String movieId) {
+        this.movieId = movieId;
+    }
 
 }

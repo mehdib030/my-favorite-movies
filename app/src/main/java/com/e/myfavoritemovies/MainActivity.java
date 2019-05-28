@@ -1,5 +1,6 @@
 package com.e.myfavoritemovies;
 
+import android.arch.persistence.room.util.StringUtil;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                             break;
                         case "Favorites":
                             movieType =FAVORITES;
-
+                            break;
                     }
                     loadMoviesData();
                 }
@@ -131,21 +132,15 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
             movieList= new ArrayList();
 
-            try {
-                    URL url = NetworkUtils.buildUrl(MainActivity.this,movieType,1); //TODO: add lazy loading scrolling for real life scenario
-                    try {
-                        String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
-                        movieList.addAll(
-                                Arrays.asList(JsonUtils.getMovieTitlesFromJson(MainActivity.this, moviesJsonString)));
-                    } catch(FileNotFoundException fnfe){
-                        Log.i(TAG, "Empty Results.");
-                    }
-            } catch (IOException e) {
-                return null;
-            } catch (JSONException e) {
-                return null;
+            if(movieType == FAVORITES){
+                loadFavoriteMovies();
+            } else {
+                loadPopularAndTopRatedMovies();
             }
+
+
             Movie[] movies = new Movie[movieList.size()];
+            Log.i(TAG, "MOVIES LENGTH : "+movies.length);
             return movieList.toArray(movies);
         }
         @Override
@@ -168,8 +163,90 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     }
 
-    public void loadFavoriteMovies(){
-        List<FavoriteMovieEntry> favoriteMovies = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+    /**
+     * Loads popular and top rated movies.
+     */
+    public void loadPopularAndTopRatedMovies(){
+
+           URL url = NetworkUtils.buildUrl(MainActivity.this,movieType,1,false,null);
+
+        try {
+            try {
+                String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+                movieList.addAll(
+                        Arrays.asList(JsonUtils.getMovieTitlesFromJson(MainActivity.this, moviesJsonString)));
+            } catch(FileNotFoundException fnfe){
+                Log.i(TAG, "Empty Results.");
+            }
+        } catch (IOException ioe) {
+            Log.i(TAG, ioe.getMessage());
+        } catch (JSONException jse) {
+            Log.i(TAG, jse.getMessage());
+        }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        /*if(movieType == FAVORITES) {
+            loadFavoriteMovies();
+        }*/
+
+    }
+
+    /**
+     * Loads the favorite movies. The movies are retrieved one at a time by id.
+     */
+    public void loadFavoriteMovies() {
+
+        final List<FavoriteMovieEntry> favoriteMovies = new ArrayList();
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+
+            @Override
+            public void run() {
+                favoriteMovies.addAll(fmdb.favoriteMovieDao().loadAllFavoriteMovies());
+                if (!favoriteMovies.isEmpty()){
+                    for (FavoriteMovieEntry fme : favoriteMovies) {
+                        Log.i(TAG, "Id : " + fme.getMovieId() + ", Title : " + fme.getTitle());
+
+                        String id = fme.getMovieId();
+
+                        if(id != null) {
+
+                            URL url = NetworkUtils.buildUrl(MainActivity.this, movieType, 1, true, id);
+
+                            try {
+                                try {
+                                    String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+                                    movieList.add(JsonUtils.getFavoriteMovieTitlesFromJson(MainActivity.this, moviesJsonString));
+
+
+                                } catch (FileNotFoundException fnfe) {
+                                    Log.i(TAG, "Empty Results.");
+                                }
+                            } catch (IOException ioe) {
+                                Log.i(TAG, ioe.getMessage());
+                            } catch (JSONException jse) {
+                                Log.i(TAG, jse.getMessage());
+                            }
+                        }
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "SETTING ADAPTER "+movieList.size());
+                            adapter.setMovies(movieList);
+                        }
+                    });
+                }
+
+            }
+        });
+
+
+
 
 
     }

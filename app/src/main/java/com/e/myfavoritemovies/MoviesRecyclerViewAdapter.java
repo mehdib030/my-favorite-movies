@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import com.e.myfavoritemovies.model.Movie;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 /**
  * Recycler adapter to hold images in view holder
  */
@@ -77,5 +79,10 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
     public interface ItemClickListener {
         void onItemClick(View view, int position);
+    }
+
+    public void setMovies(List<Movie> movies){
+        this.movies = movies.toArray(new Movie[movies.size()]);
+        notifyDataSetChanged();
     }
 }

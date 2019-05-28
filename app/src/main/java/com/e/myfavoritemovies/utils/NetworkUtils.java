@@ -29,11 +29,21 @@ public class NetworkUtils {
      * @param movieType either popular or top rated
      * @return a url for the popular or top rated movies
      */
-    public static URL buildUrl(Context context, String movieType, int page){
+    public static URL buildUrl(Context context, String movieType, int page, boolean favoriteMovies, String id){
 
-        Uri builtUri = Uri.parse(context.getString(R.string.base_url)).buildUpon().appendPath(movieType)
-                .appendQueryParameter(API_KEY_NAME,context.getString(R.string.api_key_value)).
-                        appendQueryParameter("page",String.valueOf(page)).build();
+        Uri builtUri=null;
+
+         Uri.Builder builder = Uri.parse(context.getString(R.string.base_url)).buildUpon();
+
+             if(!favoriteMovies) {
+
+                 builtUri = builder.appendPath(movieType)
+                         .appendQueryParameter(API_KEY_NAME, context.getString(R.string.api_key_value)).
+                                 appendQueryParameter("page", String.valueOf(page)).build();
+             } else {
+                 builtUri = builder.appendPath(id)
+                         .appendQueryParameter(API_KEY_NAME, context.getString(R.string.api_key_value)).build();
+             }
 
         URL url=null;
 

@@ -60,8 +60,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         ArrayList<Movie> movies = (ArrayList<Movie>) intent.getSerializableExtra("movies");
-
-        Movie movie = movies.get(position);
+        final Movie movie = movies.get(position);
 
         populateUI(movie);
         Picasso.get().load(BASE_URL +movie.getImage()).into(mMovieImageView);
@@ -70,11 +69,10 @@ public class DetailActivity extends AppCompatActivity {
 
         favoriteMoviesButton.setOnClickListener(new View.OnClickListener(){
 
-
             @Override
             public void onClick(View view) {
                 System.out.println("Button clicked id : "+view.getId());
-                onSaveButtonClicked();
+                onSaveButtonClicked(movie);
             }
         });
     }
@@ -90,11 +88,12 @@ public class DetailActivity extends AppCompatActivity {
         mReleaseDateTextView.setText(movie.getReleaseDate());
     }
 
-    public void onSaveButtonClicked(){
+    public void onSaveButtonClicked(Movie movie){
 
-        String title=mOriginalTitleTextView.getText().toString();
+        String title=movie.getOriginalTitle();
+        String id = movie.getId();
 
-        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title);
+        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id);
 
         System.out.println("Saving favorite movie : "+title);
 
@@ -104,7 +103,7 @@ public class DetailActivity extends AppCompatActivity {
             public void run() {
                 fmdb.favoriteMovieDao().insertFavoriteMovie(favoriteMovieEntry);
 
-                finish();
+                //finish();
             }
         });
 

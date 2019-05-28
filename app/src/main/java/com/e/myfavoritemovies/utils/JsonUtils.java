@@ -81,6 +81,56 @@ public class JsonUtils {
         return parsedMovieTitles;
     }
 
+    public static Movie getFavoriteMovieTitlesFromJson(Context context, String jsonResponse) throws JSONException {
+
+        Movie[] parsedMovieTitles=null;
+
+        JSONObject movieJson =  new JSONObject(jsonResponse);
+
+        final String MOVIE_RESULTS = "results";
+
+        final String MOVIE_TOTAL_RESULTS="total_results";
+
+        final String MOVIE_MESSAGE_CODE = "cod";
+
+
+        if(movieJson.has(MOVIE_MESSAGE_CODE)){
+
+            int errorCode = movieJson.getInt(MOVIE_MESSAGE_CODE);
+
+            switch(errorCode){
+
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    return null;
+                default:
+                    return null;
+            }
+
+
+        }
+
+        //JSONArray movieArray = movieJson.getJSONArray(MOVIE_RESULTS);
+
+        //parsedMovieTitles = new Movie[movieArray.length()];
+
+       /* if(movieArray != null){
+
+            for(int i=0;i < movieArray.length();i++){
+
+                JSONObject jsonMovie = movieArray.getJSONObject(i);*/
+
+                Movie movie = mapJsonObjectToMovie(movieJson);
+
+                //parsedMovieTitles[i]=movie;
+
+            //}
+       // }
+
+        return movie;
+    }
+
     private static Movie mapJsonObjectToMovie(JSONObject jsonMovie){
         Movie movie = new Movie();
 
