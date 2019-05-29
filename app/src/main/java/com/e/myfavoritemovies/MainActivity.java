@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     private MoviesRecyclerViewAdapter adapter;
 
+    private MoviesRecyclerViewAdapter mAdapter;
+
     private List<Movie> movieList;
 
     private String[] sort = {"Popular","Top Rated","Favorites"};
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     private String movieType;
 
     private AppDatabase fmdb;
+
+    private List<FavoriteMovieEntry> favoriteMovies =new ArrayList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     public void loadMoviesData(){
         new FetchMoviesTask().execute();
     }
+
+
 
     @Override
     public void onItemClick(View view, int position) {
@@ -99,15 +106,19 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                     switch(item.toString()) {
                         case "Popular":
                             movieType = POPULAR_MOVIES;
+                            loadMoviesData();
                             break;
                         case "Top Rated":
                             movieType = TOP_RATED_MOVIES;
+                            loadMoviesData();
                             break;
                         case "Favorites":
                             movieType =FAVORITES;
+                            /*fectchMoviesFromDatatabase();
+                            loadFavoriteMoviesData();*/
                             break;
                     }
-                    loadMoviesData();
+
                 }
             }
 
@@ -125,7 +136,9 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     /**
      * This async task retrieves the movie list
      */
-    public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Integer, Movie[]> {
+
+
 
         @Override
         protected Movie[] doInBackground(String... params) {
@@ -138,10 +151,14 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                 loadPopularAndTopRatedMovies();
             }
 
-
             Movie[] movies = new Movie[movieList.size()];
             Log.i(TAG, "MOVIES LENGTH : "+movies.length);
             return movieList.toArray(movies);
+        }
+        @Override
+        public void onProgressUpdate(Integer ... values){
+            super.onProgressUpdate(values);
+            Log.i(TAG,"ON UPDATE PROGRESS ");
         }
         @Override
         public void onPostExecute(Movie[] moviesData){
@@ -158,6 +175,50 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                 adapter.setClickListener(MainActivity.this);
 
                 recyclerView.setAdapter(adapter);
+            }
+        }
+
+    }
+
+    /**
+     * This async task retrieves the movie list
+     */
+    public class FetchFavoriteMoviesTask extends AsyncTask<String, Void, Movie[]> {
+
+
+        @Override
+        protected Movie[] doInBackground(String... params) {
+
+            movieList= new ArrayList();
+
+            if(movieType == FAVORITES){
+                loadFavoriteMovies();
+            }
+
+            Movie[] movies = new Movie[movieList.size()];
+            Log.i(TAG, "MOVIES LENGTH : "+movies.length);
+            return movieList.toArray(movies);
+        }
+        @Override
+        public void onPreExecute(){
+            Log.i(TAG, "***** On PreExecute ");
+
+        }
+        @Override
+        public void onPostExecute(Movie[] moviesData){
+            if (moviesData != null){
+
+                RecyclerView recyclerView = findViewById(R.id.movies_recylerview);
+
+                final GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,4);
+
+                recyclerView.setLayoutManager(gridLayoutManager);
+
+                mAdapter = new MoviesRecyclerViewAdapter(MainActivity.this,moviesData,moviesData.length);
+
+                mAdapter.setClickListener(MainActivity.this);
+
+                recyclerView.setAdapter(mAdapter);
             }
         }
 
@@ -188,26 +249,59 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     @Override
     protected void onResume(){
         super.onResume();
-        /*if(movieType == FAVORITES) {
-            loadFavoriteMovies();
-        }*/
+       // if(movieType == FAVORITES) {
+            //loadFavoriteMovies();
+
+           /* runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i(TAG, "SETTING ADAPTER "+movieList.size());
+                    adapter.setMovies(movieList);
+                }
+            });*/
+
+       // }
+
 
     }
 
+    public void loadFavoriteMoviesData(){
+
+        //fectchMoviesFromDatatabase();
+
+        new FetchFavoriteMoviesTask().execute();
+    }
+
+    public void fectchMoviesFromDatatabase(){
+        //final List<FavoriteMovieEntry> favoriteMovies = new ArrayList();
+        Log.i(TAG, "*********** fectchMoviesFromDatatabase");
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+
+            @Override
+            public void run() {
+                Log.i(TAG, "*********** Running fectchMoviesFromDatatabase");
+                List<FavoriteMovieEntry> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+                Log.i(TAG, "*********** Running fectchMoviesFromDatatabase SIZE : "+favoriteMoviesEntries.size());
+
+                favoriteMovies.addAll(favoriteMoviesEntries);
+
+            }
+        });
+
+    }
     /**
      * Loads the favorite movies. The movies are retrieved one at a time by id.
      */
     public void loadFavoriteMovies() {
 
-        final List<FavoriteMovieEntry> favoriteMovies = new ArrayList();
 
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-
-            @Override
-            public void run() {
-                favoriteMovies.addAll(fmdb.favoriteMovieDao().loadAllFavoriteMovies());
+        Log.i(TAG, "*********** loadFavoriteMovies 1");
                 if (!favoriteMovies.isEmpty()){
-                    for (FavoriteMovieEntry fme : favoriteMovies) {
+                    Log.i(TAG, "*********** loadFavoriteMovies 2");
+                    Iterator<FavoriteMovieEntry> it = favoriteMovies.iterator();
+                    while(it.hasNext()){
+                    //for (FavoriteMovieEntry fme : favoriteMovies) {
+                        FavoriteMovieEntry fme = it.next();
                         Log.i(TAG, "Id : " + fme.getMovieId() + ", Title : " + fme.getTitle());
 
                         String id = fme.getMovieId();
@@ -221,7 +315,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                                     String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
                                     movieList.add(JsonUtils.getFavoriteMovieTitlesFromJson(MainActivity.this, moviesJsonString));
 
-
                                 } catch (FileNotFoundException fnfe) {
                                     Log.i(TAG, "Empty Results.");
                                 }
@@ -230,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                             } catch (JSONException jse) {
                                 Log.i(TAG, jse.getMessage());
                             }
+
                         }
                     }
 
@@ -237,17 +331,10 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                         @Override
                         public void run() {
                             Log.i(TAG, "SETTING ADAPTER "+movieList.size());
-                            adapter.setMovies(movieList);
+                            mAdapter.setMovies(movieList);
                         }
                     });
                 }
-
-            }
-        });
-
-
-
-
 
     }
 }

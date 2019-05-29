@@ -24,4 +24,7 @@ public interface FavoriteMovieDao {
     @Delete
     void deleteFavoriteMovie(FavoriteMovieEntry favoriteMovie);
 
+    @Query("delete from FavoriteMovie where movieId = :movieId")
+    void deleteFavoriteMovieById(String movieId);
+
 }

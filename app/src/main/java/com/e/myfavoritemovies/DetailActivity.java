@@ -16,11 +16,15 @@ import com.e.myfavoritemovies.model.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "extra_position";
     private static final int DEFAULT_POSITION = -1;
+    private static final String MARK_AS_FAVORITE = "MARK AS FAVORITE";
+    private static final String REMOVE_AS_FAVORITE = "REMOVE AS FAVORITE";
 
     private static final String BASE_URL="http://image.tmdb.org/t/p/w185//";
 
@@ -72,7 +76,22 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 System.out.println("Button clicked id : "+view.getId());
-                onSaveButtonClicked(movie);
+
+
+
+                String buttonText =  ((AppCompatButton)view).getText().toString();
+
+                switch(buttonText){
+                    case MARK_AS_FAVORITE:
+                        onSaveButtonClicked(movie,view);
+                        break;
+                    case REMOVE_AS_FAVORITE:
+                        onRemoveButtonClicked(movie,view);
+                        break;
+                }
+
+                //System.out.println("~~~~ BUTTON TEXT : "+buttonText);
+                //onSaveButtonClicked(movie,view);
             }
         });
     }
@@ -88,14 +107,14 @@ public class DetailActivity extends AppCompatActivity {
         mReleaseDateTextView.setText(movie.getReleaseDate());
     }
 
-    public void onSaveButtonClicked(Movie movie){
+    public void onSaveButtonClicked(Movie movie,View view){
 
         String title=movie.getOriginalTitle();
         String id = movie.getId();
 
         final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id);
 
-        System.out.println("Saving favorite movie : "+title);
+        System.out.println("Saving favorite movie : "+title+", id : "+id);
 
         AppExecutors.getInstance().diskIO().execute(new Runnable(){
 
@@ -103,10 +122,48 @@ public class DetailActivity extends AppCompatActivity {
             public void run() {
                 fmdb.favoriteMovieDao().insertFavoriteMovie(favoriteMovieEntry);
 
+                List<FavoriteMovieEntry> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+
+                Iterator it = favs.iterator();
+
+                while(it.hasNext()){
+                    FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
+                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId());
+                }
                 //finish();
             }
         });
 
+        ((AppCompatButton)view).setText("REMOVE AS FAVORITE"); //TODO: put is strings.xml
+
+    }
+
+    public void onRemoveButtonClicked(Movie movie,View view){ //TODO: merge with onSaveButtonClicked()
+        String title=movie.getOriginalTitle();
+        final String id = movie.getId();
+
+        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id);
+
+        System.out.println("Removing favorite movie : "+title+", id : "+id);
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable(){
+
+            @Override
+            public void run() {
+                fmdb.favoriteMovieDao().deleteFavoriteMovieById(id);
+
+                List<FavoriteMovieEntry> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+
+                Iterator it = favs.iterator();
+
+                while(it.hasNext()){
+                    FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
+                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId());
+                }
+            }
+        });
+
+        ((AppCompatButton)view).setText("MARK AS FAVORITE"); //TODO: put is strings.xml
     }
 
 

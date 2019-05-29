@@ -3,6 +3,6 @@
     <string name="api_key_value">2830d7b62b683f28c1c092afbea0196e</string>
     <string name="base_url">http://api.themoviedb.org/3/movie/</string>
     <string name="image_base_url">http://image.tmdb.org/t/p/w185//</string>n
-    <string name="favorite_movie_value">Mark As Favorite</string>
+    <string name="favorite_movie_value">MARK AS FAVORITE</string>
 
 </resources>
