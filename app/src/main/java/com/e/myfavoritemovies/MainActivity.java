@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                             break;
                         case "Favorites":
                             movieType =FAVORITES;
-                            /*fectchMoviesFromDatatabase();
-                            loadFavoriteMoviesData();*/
+                            /*fectchMoviesFromDatatabase();*/
+                            loadFavoriteMoviesData();
                             break;
                     }
 
@@ -294,6 +294,11 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
      */
     public void loadFavoriteMovies() {
 
+        Log.i(TAG, "*********** Running fectchMoviesFromDatatabase");
+        List<FavoriteMovieEntry> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+        Log.i(TAG, "*********** Running fectchMoviesFromDatatabase SIZE : "+favoriteMoviesEntries.size());
+
+        favoriteMovies.addAll(favoriteMoviesEntries);
 
         Log.i(TAG, "*********** loadFavoriteMovies 1");
                 if (!favoriteMovies.isEmpty()){
@@ -327,13 +332,13 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                         }
                     }
 
-                    runOnUiThread(new Runnable() {
+                    /*runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Log.i(TAG, "SETTING ADAPTER "+movieList.size());
                             mAdapter.setMovies(movieList);
                         }
-                    });
+                    });*/
                 }
 
     }
