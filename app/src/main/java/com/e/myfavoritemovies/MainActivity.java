@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.e.myfavoritemovies.Database.AppDatabase;
 import com.e.myfavoritemovies.Database.FavoriteMovieEntry;
 import com.e.myfavoritemovies.model.Movie;
+import com.e.myfavoritemovies.model.Review;
 import com.e.myfavoritemovies.utils.JsonUtils;
 import com.e.myfavoritemovies.utils.NetworkUtils;
 import org.json.JSONException;
@@ -54,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     private List<FavoriteMovieEntry> favoriteMovies =new ArrayList();
 
+    private List<Review> reviewList;
+
+    private String movieId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,14 +71,14 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_POSITION,position);
         intent.putExtra("movies", (ArrayList<Movie>)movieList);
+       // Movie movie = movieList.get(position);
+        //intent.putExtra("movie", movieList.get(position));
         startActivity(intent);
     }
 
     public void loadMoviesData(){
         new FetchMoviesTask().execute();
     }
-
-
 
     @Override
     public void onItemClick(View view, int position) {
@@ -106,19 +111,15 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                     switch(item.toString()) {
                         case "Popular":
                             movieType = POPULAR_MOVIES;
-                            loadMoviesData();
                             break;
                         case "Top Rated":
                             movieType = TOP_RATED_MOVIES;
-                            loadMoviesData();
                             break;
                         case "Favorites":
                             movieType =FAVORITES;
-                            /*fectchMoviesFromDatatabase();*/
-                            loadFavoriteMoviesData();
                             break;
                     }
-
+                    loadMoviesData();
                 }
             }
 
@@ -132,13 +133,10 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         return true;
     }
 
-
     /**
      * This async task retrieves the movie list
      */
     public class FetchMoviesTask extends AsyncTask<String, Integer, Movie[]> {
-
-
 
         @Override
         protected Movie[] doInBackground(String... params) {
@@ -175,50 +173,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                 adapter.setClickListener(MainActivity.this);
 
                 recyclerView.setAdapter(adapter);
-            }
-        }
-
-    }
-
-    /**
-     * This async task retrieves the movie list
-     */
-    public class FetchFavoriteMoviesTask extends AsyncTask<String, Void, Movie[]> {
-
-
-        @Override
-        protected Movie[] doInBackground(String... params) {
-
-            movieList= new ArrayList();
-
-            if(movieType == FAVORITES){
-                loadFavoriteMovies();
-            }
-
-            Movie[] movies = new Movie[movieList.size()];
-            Log.i(TAG, "MOVIES LENGTH : "+movies.length);
-            return movieList.toArray(movies);
-        }
-        @Override
-        public void onPreExecute(){
-            Log.i(TAG, "***** On PreExecute ");
-
-        }
-        @Override
-        public void onPostExecute(Movie[] moviesData){
-            if (moviesData != null){
-
-                RecyclerView recyclerView = findViewById(R.id.movies_recylerview);
-
-                final GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,4);
-
-                recyclerView.setLayoutManager(gridLayoutManager);
-
-                mAdapter = new MoviesRecyclerViewAdapter(MainActivity.this,moviesData,moviesData.length);
-
-                mAdapter.setClickListener(MainActivity.this);
-
-                recyclerView.setAdapter(mAdapter);
             }
         }
 
@@ -262,27 +216,15 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
        // }
 
-
     }
 
-    public void loadFavoriteMoviesData(){
-
-        //fectchMoviesFromDatatabase();
-
-        new FetchFavoriteMoviesTask().execute();
-    }
 
     public void fectchMoviesFromDatatabase(){
-        //final List<FavoriteMovieEntry> favoriteMovies = new ArrayList();
-        Log.i(TAG, "*********** fectchMoviesFromDatatabase");
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
 
             @Override
             public void run() {
-                Log.i(TAG, "*********** Running fectchMoviesFromDatatabase");
                 List<FavoriteMovieEntry> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
-                Log.i(TAG, "*********** Running fectchMoviesFromDatatabase SIZE : "+favoriteMoviesEntries.size());
-
                 favoriteMovies.addAll(favoriteMoviesEntries);
 
             }
@@ -294,52 +236,47 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
      */
     public void loadFavoriteMovies() {
 
-        Log.i(TAG, "*********** Running fectchMoviesFromDatatabase");
         List<FavoriteMovieEntry> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
-        Log.i(TAG, "*********** Running fectchMoviesFromDatatabase SIZE : "+favoriteMoviesEntries.size());
-
         favoriteMovies.addAll(favoriteMoviesEntries);
 
-        Log.i(TAG, "*********** loadFavoriteMovies 1");
-                if (!favoriteMovies.isEmpty()){
-                    Log.i(TAG, "*********** loadFavoriteMovies 2");
-                    Iterator<FavoriteMovieEntry> it = favoriteMovies.iterator();
-                    while(it.hasNext()){
-                    //for (FavoriteMovieEntry fme : favoriteMovies) {
-                        FavoriteMovieEntry fme = it.next();
-                        Log.i(TAG, "Id : " + fme.getMovieId() + ", Title : " + fme.getTitle());
+            if (!favoriteMovies.isEmpty()){
 
-                        String id = fme.getMovieId();
+                Iterator<FavoriteMovieEntry> it = favoriteMovies.iterator();
+                while(it.hasNext()){
+                    FavoriteMovieEntry fme = it.next();
+                    Log.i(TAG, "Id : " + fme.getMovieId() + ", Title : " + fme.getTitle());
 
-                        if(id != null) {
+                    String id = fme.getMovieId();
 
-                            URL url = NetworkUtils.buildUrl(MainActivity.this, movieType, 1, true, id);
+                    if(id != null) {
 
+                        URL url = NetworkUtils.buildUrl(MainActivity.this, movieType, 1, true, id);
+
+                        try {
                             try {
-                                try {
-                                    String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
-                                    movieList.add(JsonUtils.getFavoriteMovieTitlesFromJson(MainActivity.this, moviesJsonString));
-
-                                } catch (FileNotFoundException fnfe) {
-                                    Log.i(TAG, "Empty Results.");
-                                }
-                            } catch (IOException ioe) {
-                                Log.i(TAG, ioe.getMessage());
-                            } catch (JSONException jse) {
-                                Log.i(TAG, jse.getMessage());
+                                String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+                                movieList.add(JsonUtils.getFavoriteMovieTitlesFromJson(MainActivity.this, moviesJsonString));
+                            } catch (FileNotFoundException fnfe) {
+                                Log.i(TAG, "Empty Results.");
                             }
-
+                        } catch (IOException ioe) {
+                            Log.i(TAG, ioe.getMessage());
+                        } catch (JSONException jse) {
+                            Log.i(TAG, jse.getMessage());
                         }
+
                     }
-
-                    /*runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.i(TAG, "SETTING ADAPTER "+movieList.size());
-                            mAdapter.setMovies(movieList);
-                        }
-                    });*/
                 }
 
+                /*runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.i(TAG, "SETTING ADAPTER "+movieList.size());
+                        mAdapter.setMovies  (movieList);
+                    }
+                });*/
+            }
     }
+
+
 }

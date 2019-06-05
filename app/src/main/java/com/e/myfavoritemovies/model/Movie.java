@@ -1,6 +1,8 @@
 package com.e.myfavoritemovies.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a movie object model
@@ -18,6 +20,8 @@ public class Movie implements Serializable {
     private String plotSynopsis;
     private String rating;
     private String releaseDate;
+
+    private List<Review> reviews = new ArrayList();
 
     public Movie(){}
 
@@ -77,5 +81,14 @@ public class Movie implements Serializable {
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
 
 }

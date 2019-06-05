@@ -4,5 +4,6 @@
     <string name="base_url">http://api.themoviedb.org/3/movie/</string>
     <string name="image_base_url">http://image.tmdb.org/t/p/w185//</string>n
     <string name="favorite_movie_value">MARK AS FAVORITE</string>
+    <string name="movie_reviews_value">Movie Reviews</string>
 
 </resources>

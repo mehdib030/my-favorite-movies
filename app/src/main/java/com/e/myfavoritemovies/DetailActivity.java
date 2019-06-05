@@ -1,6 +1,7 @@
 package com.e.myfavoritemovies;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
@@ -13,13 +14,24 @@ import android.widget.Toast;
 import com.e.myfavoritemovies.Database.AppDatabase;
 import com.e.myfavoritemovies.Database.FavoriteMovieEntry;
 import com.e.myfavoritemovies.model.Movie;
+import com.e.myfavoritemovies.model.Review;
+import com.e.myfavoritemovies.utils.JsonUtils;
+import com.e.myfavoritemovies.utils.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
+
+    private static final String TAG = DetailActivity.class.getSimpleName();
 
     public static final String EXTRA_POSITION = "extra_position";
     private static final int DEFAULT_POSITION = -1;
@@ -35,6 +47,12 @@ public class DetailActivity extends AppCompatActivity {
     private TextView mReleaseDateTextView;
 
     private AppDatabase fmdb;
+
+    private List<Review> reviewList;
+
+    private String movieId;
+
+    Movie movie=null;
 
 
     @Override
@@ -64,9 +82,16 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         ArrayList<Movie> movies = (ArrayList<Movie>) intent.getSerializableExtra("movies");
-        final Movie movie = movies.get(position);
+        this.movie = movies.get(position);
 
-        populateUI(movie);
+        this.movieId = movie.getId();
+
+        new FetchReviewsTask().execute();
+
+        final Movie movieWithReviews = this.movie;
+
+        populateUI(movieWithReviews);
+
         Picasso.get().load(BASE_URL +movie.getImage()).into(mMovieImageView);
 
         AppCompatButton favoriteMoviesButton = findViewById(R.id.favorite_movie_button);
@@ -76,22 +101,29 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 System.out.println("Button clicked id : "+view.getId());
-
-
-
                 String buttonText =  ((AppCompatButton)view).getText().toString();
 
                 switch(buttonText){
                     case MARK_AS_FAVORITE:
-                        onSaveButtonClicked(movie,view);
+                        onSaveButtonClicked(movieWithReviews,view);
                         break;
                     case REMOVE_AS_FAVORITE:
-                        onRemoveButtonClicked(movie,view);
+                        onRemoveButtonClicked(movieWithReviews,view);
                         break;
                 }
+            }
+        });
 
-                //System.out.println("~~~~ BUTTON TEXT : "+buttonText);
-                //onSaveButtonClicked(movie,view);
+        AppCompatButton reviewsButton = findViewById(R.id.movie_reviews_button);
+
+        reviewsButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                System.out.println("Reviews Button clicked id : "+view.getId());
+                String buttonText =  ((AppCompatButton)view).getText().toString();
+
+                launchReviewsActivity();
             }
         });
     }
@@ -134,7 +166,7 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        ((AppCompatButton)view).setText("REMOVE AS FAVORITE"); //TODO: put is strings.xml
+        ((AppCompatButton)view).setText("REMOVE AS FAVORITE"); //TODO: put in strings.xml
 
     }
 
@@ -170,5 +202,64 @@ public class DetailActivity extends AppCompatActivity {
     private void closeOnError(){
         finish();
         Toast.makeText(this,"Movie data not available.",Toast.LENGTH_SHORT);
+    }
+
+    public class FetchReviewsTask extends AsyncTask<String,Integer, List<Review>> {
+
+        @Override
+        protected List<Review> doInBackground(String... strings) {
+
+            reviewList= new ArrayList();
+
+            reviewList = loadReviews();
+
+            /*if(movieType == FAVORITES){
+                loadFavoriteMovies();
+            } else {
+                loadPopularAndTopRatedMovies();
+            }*/
+
+            Review[] reviews = new Review[reviewList.size()];
+            Log.i(TAG, "Reviews LENGTH : "+reviews.length);
+
+            return reviewList;
+
+        }
+        @Override
+        public void onPostExecute(List<Review> reviews){
+            reviewList.addAll(reviews);
+        }
+    }
+
+    private List<Review> loadReviews(){
+
+        URL url = NetworkUtils.buildReviewsUrl(DetailActivity.this,movieId,1,false,null);
+
+        try {
+            try {
+                String reviewsJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+                reviewList.addAll(
+                        Arrays.asList(JsonUtils.getReviewsFromJson(DetailActivity.this, reviewsJsonString)));
+
+                this.movie.setReviews(reviewList);
+            } catch(FileNotFoundException fnfe){
+                Log.i(TAG, "Empty Results.");
+            }
+        } catch (IOException ioe) {
+            Log.i(TAG, ioe.getMessage());
+        } catch (JSONException jse) {
+            Log.i(TAG, jse.getMessage());
+        }
+
+        return reviewList;
+    }
+
+    private void launchReviewsActivity() {
+        Intent intent = new Intent(this, ReviewsActivity.class);
+        //intent.putExtra(DetailActivity.EXTRA_POSITION,position);
+        intent.putExtra("reviews", (ArrayList<Review>)reviewList);
+        // Movie movie = movieList.get(position);
+        //intent.putExtra("movie", movieList.get(position));
+        startActivity(intent);
     }
 }

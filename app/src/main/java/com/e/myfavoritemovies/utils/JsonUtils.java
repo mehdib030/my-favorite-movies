@@ -3,6 +3,7 @@ package com.e.myfavoritemovies.utils;
 import android.content.Context;
 
 import com.e.myfavoritemovies.model.Movie;
+import com.e.myfavoritemovies.model.Review;
 
 
 import org.json.JSONArray;
@@ -16,18 +17,17 @@ import java.util.List;
 public class JsonUtils {
 
     private static final String MOVIE_ID="id";
-
     private static final String MOVIE_POSTER="poster_path";
-
     private static final String MOVIE_RATING="vote_average";
-
     private static final String MOVIE_RELEASE_DATE="release_date";
-
     private static final String MOVIE_TITLE="title";
-
     private static final String MOVIE_ORIGINAL_TITLE="original_title";
-
     private static final String MOVIE_OVERVIEW="overview";
+
+    private static final String REVIEW_ID="id";
+    private static final String REVIEW_AUTHOR = "author";
+    private static final String REVIEW_CONTENT = "content";
+    private static final String REVIEW_URL = "url";
 
 
 
@@ -167,5 +167,78 @@ public class JsonUtils {
             }
         }
         return listdata;
+    }
+
+    /**
+     * Gets the reviews from the json string response
+     * https://api.themoviedb.org/3/movie/4
+     * @param context
+     * @param jsonResponse
+     * @return
+     * @throws JSONException
+     */
+    public static Review[] getReviewsFromJson(Context context, String jsonResponse) throws JSONException{
+
+        Review[] parsedReviews=null;
+
+        JSONObject reviewJson =  new JSONObject(jsonResponse);
+
+        final String REVIEW_RESULTS = "results";
+
+        final String REVIEW_TOTAL_RESULTS="total_results";
+
+        final String MOVIE_MESSAGE_CODE = "cod";
+
+
+        if(reviewJson.has(MOVIE_MESSAGE_CODE)){
+
+            int errorCode = reviewJson.getInt(MOVIE_MESSAGE_CODE);
+
+            switch(errorCode){
+
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    return null;
+                default:
+                    return null;
+            }
+
+
+        }
+
+        JSONArray reviewArray = reviewJson.getJSONArray(REVIEW_RESULTS);
+
+        parsedReviews = new Review[reviewArray.length()];
+
+        if(reviewArray != null){
+
+            for(int i=0;i < reviewArray.length();i++){
+
+                JSONObject jsonReview = reviewArray.getJSONObject(i);
+
+                Review review = mapJsonObjectToReview(jsonReview);
+
+                parsedReviews[i]=review;
+
+            }
+        }
+        return parsedReviews;
+    }
+
+    private static Review mapJsonObjectToReview(JSONObject jsonReview){
+        Review review = new Review();
+
+        try {
+            review.setId(jsonReview.getString(REVIEW_ID));
+            review.setAuthor(jsonReview.getString(REVIEW_AUTHOR));
+            review.setContent(jsonReview.getString(REVIEW_CONTENT));
+            review.setUrl(jsonReview.getString(REVIEW_URL));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return review;
     }
 }

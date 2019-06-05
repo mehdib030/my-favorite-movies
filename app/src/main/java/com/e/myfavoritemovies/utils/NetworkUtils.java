@@ -25,9 +25,13 @@ public class NetworkUtils {
 
 
     /**
-     * Returns the url of either the popular or top rated movies
-     * @param movieType either popular or top rated
-     * @return a url for the popular or top rated movies
+     * https://api.themoviedb.org/3/movie/4
+     * @param context
+     * @param movieType
+     * @param page
+     * @param favoriteMovies
+     * @param id
+     * @return
      */
     public static URL buildUrl(Context context, String movieType, int page, boolean favoriteMovies, String id){
 
@@ -44,6 +48,43 @@ public class NetworkUtils {
                  builtUri = builder.appendPath(id)
                          .appendQueryParameter(API_KEY_NAME, context.getString(R.string.api_key_value)).build();
              }
+
+        URL url=null;
+
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace(); //TODO:remove
+        }
+        Log.v(TAG, "Built Url "+url);
+
+        return url;
+    }
+
+    /**
+     * Returns the url of either the popular or top rated movies
+     * @param movieType either popular or top rated
+     * @return a url for the popular or top rated movies
+     */
+    /**
+     *
+     * @param context
+     * @param movieId
+     * @param page
+     * @param favoriteMovies
+     * @param id
+     * @return
+     */
+    public static URL buildReviewsUrl(Context context, String movieId, int page, boolean favoriteMovies, String id){
+
+        Uri builtUri=null;
+
+        Uri.Builder builder = Uri.parse(context.getString(R.string.base_url)).buildUpon();
+
+
+        builtUri = builder.appendPath(movieId).appendPath("reviews")
+                    .appendQueryParameter(API_KEY_NAME, context.getString(R.string.api_key_value)).
+                            appendQueryParameter("page", String.valueOf(page)).build();
 
         URL url=null;
 
