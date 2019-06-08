@@ -6,17 +6,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
 import com.e.myfavoritemovies.model.Review;
+
+import java.util.List;
 
 public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecyclerViewAdapter.ViewHolder> {
 
     private int mNumberOfItems;
-    private Review[] reviews;
+    private List<Review> reviews;
     private LayoutInflater mLayoutInflater;
-    private MoviesRecyclerViewAdapter.ItemClickListener mItemClickListener;
+    private ItemClickListener mItemClickListener;
     private Context context;
 
-    public ReviewsRecyclerViewAdapter(Context context, Review[] reviews,int numberOfItems){
+    public ReviewsRecyclerViewAdapter(Context context, List<Review> reviews,int numberOfItems){
         this.mLayoutInflater =  LayoutInflater.from(context);
         this.reviews=reviews;
         this.mNumberOfItems=numberOfItems;
@@ -32,19 +36,42 @@ public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecy
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Review review = reviews[position];
+        Review review = reviews.get(position);
+
+        holder.mIdTextView.setText(review.getId());
+
+        holder.mAuthorTextView.setText(review.getAuthor());
+
+        holder.mContentTextView.setText(review.getContent());
+
+        holder.mUrlTextView.setText(review.getUrl());
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return this.mNumberOfItems;
     }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        TextView mIdTextView;
+        TextView mAuthorTextView;
+        TextView mContentTextView;
+        TextView mUrlTextView;
 
         ViewHolder(View itemView){
             super(itemView);
+
+            mIdTextView = itemView.findViewById(R.id.review_id);
+
+            mAuthorTextView = itemView.findViewById(R.id.review_author);
+
+            mContentTextView = itemView.findViewById(R.id.review_content);
+
+            mUrlTextView = itemView.findViewById(R.id.review_url);
+
+
+
             itemView.setOnClickListener(this);
         }
 
@@ -54,7 +81,7 @@ public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecy
         }
     }
 
-    public void setClickListener(MoviesRecyclerViewAdapter.ItemClickListener itemClickListener){
+    public void setClickListener(ItemClickListener itemClickListener){
         this.mItemClickListener=itemClickListener;
     }
 

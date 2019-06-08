@@ -86,11 +86,11 @@ public class DetailActivity extends AppCompatActivity {
 
         this.movieId = movie.getId();
 
-        new FetchReviewsTask().execute();
+        //new FetchReviewsTask().execute();
 
-        final Movie movieWithReviews = this.movie;
+       // final Movie movieWithReviews = this.movie;
 
-        populateUI(movieWithReviews);
+        populateUI(movie);
 
         Picasso.get().load(BASE_URL +movie.getImage()).into(mMovieImageView);
 
@@ -105,10 +105,10 @@ public class DetailActivity extends AppCompatActivity {
 
                 switch(buttonText){
                     case MARK_AS_FAVORITE:
-                        onSaveButtonClicked(movieWithReviews,view);
+                        onSaveButtonClicked(movie,view);
                         break;
                     case REMOVE_AS_FAVORITE:
-                        onRemoveButtonClicked(movieWithReviews,view);
+                        onRemoveButtonClicked(movie,view);
                         break;
                 }
             }
@@ -213,12 +213,6 @@ public class DetailActivity extends AppCompatActivity {
 
             reviewList = loadReviews();
 
-            /*if(movieType == FAVORITES){
-                loadFavoriteMovies();
-            } else {
-                loadPopularAndTopRatedMovies();
-            }*/
-
             Review[] reviews = new Review[reviewList.size()];
             Log.i(TAG, "Reviews LENGTH : "+reviews.length);
 
@@ -257,9 +251,11 @@ public class DetailActivity extends AppCompatActivity {
     private void launchReviewsActivity() {
         Intent intent = new Intent(this, ReviewsActivity.class);
         //intent.putExtra(DetailActivity.EXTRA_POSITION,position);
-        intent.putExtra("reviews", (ArrayList<Review>)reviewList);
+        //intent.putExtra("reviews", (ArrayList<Review>)reviewList);
         // Movie movie = movieList.get(position);
-        //intent.putExtra("movie", movieList.get(position));
+        intent.putExtra("movie", this.movie);
         startActivity(intent);
     }
+
+
 }
