@@ -22,6 +22,7 @@ public class Movie implements Serializable {
     private String releaseDate;
 
     private List<Review> reviews = new ArrayList();
+    private List<Trailer> trailers = new ArrayList();
 
     public Movie(){}
 
@@ -88,6 +89,14 @@ public class Movie implements Serializable {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public List<Trailer> getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(List<Trailer> trailers) {
+        this.trailers = trailers;
     }
 
 

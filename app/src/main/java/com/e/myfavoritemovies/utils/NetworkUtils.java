@@ -98,6 +98,27 @@ public class NetworkUtils {
         return url;
     }
 
+    public static URL buildTrailersUrl(Context context,String movieId,int page){
+        Uri builtUri=null;
+
+        Uri.Builder builder = Uri.parse("http://api.themoviedb.org/3/movie/").buildUpon();
+
+        builtUri = builder.appendPath(movieId).appendPath("videos")
+                    .appendQueryParameter(API_KEY_NAME,context.getString(R.string.api_key_value)).
+                        appendQueryParameter("page",String.valueOf(page)).build();
+
+        URL url=null;
+
+        try{
+            url = new URL(builtUri.toString());
+        } catch(MalformedURLException e){
+            e.printStackTrace(); //TODO:remove
+        }
+        Log.v(TAG, "Built Url "+url);
+
+        return url;
+    }
+
     /**
      * This method returns the entire result from the HTTP response.
      *

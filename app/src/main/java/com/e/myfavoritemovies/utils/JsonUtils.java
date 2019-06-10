@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.e.myfavoritemovies.model.Movie;
 import com.e.myfavoritemovies.model.Review;
+import com.e.myfavoritemovies.model.Trailer;
 
 
 import org.json.JSONArray;
@@ -28,6 +29,10 @@ public class JsonUtils {
     private static final String REVIEW_AUTHOR = "author";
     private static final String REVIEW_CONTENT = "content";
     private static final String REVIEW_URL = "url";
+
+    private static final String TRAILER_ID="id";
+    private static final String TRAILER_KEY = "key";
+
 
 
 
@@ -226,6 +231,64 @@ public class JsonUtils {
         return parsedReviews;
     }
 
+    /**
+     * Gets the reviews from the json string response
+     * https://api.themoviedb.org/3/movie/4
+     * @param context
+     * @param jsonResponse
+     * @return
+     * @throws JSONException
+     */
+    public static Trailer[] getTrailersFromJson(Context context, String jsonResponse) throws JSONException{
+
+        Trailer[] parsedTrailers=null;
+
+        JSONObject trailerJson =  new JSONObject(jsonResponse);
+
+        final String TRAILER_RESULTS = "results";
+
+        final String TRAILER_TOTAL_RESULTS="total_results";
+
+        final String MOVIE_MESSAGE_CODE = "cod";
+
+
+        if(trailerJson.has(MOVIE_MESSAGE_CODE)){
+
+            int errorCode = trailerJson.getInt(MOVIE_MESSAGE_CODE);
+
+            switch(errorCode){
+
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    return null;
+                default:
+                    return null;
+            }
+
+
+        }
+
+        JSONArray trailerArray = trailerJson.getJSONArray(TRAILER_RESULTS);
+
+        parsedTrailers = new Trailer[trailerArray.length()];
+
+        if(trailerArray != null){
+
+            for(int i=0;i < trailerArray.length();i++){
+
+                JSONObject jsonReview = trailerArray.getJSONObject(i);
+
+                Trailer trailer = mapJsonObjectToTrailer(jsonReview);
+
+                parsedTrailers[i]=trailer;
+
+            }
+        }
+        return parsedTrailers;
+    }
+
+
     private static Review mapJsonObjectToReview(JSONObject jsonReview){
         Review review = new Review();
 
@@ -240,5 +303,19 @@ public class JsonUtils {
         }
 
         return review;
+    }
+
+    private static Trailer mapJsonObjectToTrailer(JSONObject jsonReview){
+        Trailer trailer = new Trailer();
+
+        try {
+            trailer.setId(jsonReview.getString(TRAILER_ID));
+            trailer.setKey(jsonReview.getString(TRAILER_KEY));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return trailer;
     }
 }

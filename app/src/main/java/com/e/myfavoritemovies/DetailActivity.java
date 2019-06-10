@@ -5,9 +5,12 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +18,7 @@ import com.e.myfavoritemovies.Database.AppDatabase;
 import com.e.myfavoritemovies.Database.FavoriteMovieEntry;
 import com.e.myfavoritemovies.model.Movie;
 import com.e.myfavoritemovies.model.Review;
+import com.e.myfavoritemovies.model.Trailer;
 import com.e.myfavoritemovies.utils.JsonUtils;
 import com.e.myfavoritemovies.utils.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -49,10 +53,13 @@ public class DetailActivity extends AppCompatActivity {
     private AppDatabase fmdb;
 
     private List<Review> reviewList;
+    private List<Trailer> trailerList;
 
     private String movieId;
 
-    Movie movie=null;
+    private Movie movie=null;
+
+    private TrailersRecyclerViewAdapter adapter;
 
 
     @Override
@@ -113,6 +120,8 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
+
+        populateTrailers();
 
         AppCompatButton reviewsButton = findViewById(R.id.movie_reviews_button);
 
@@ -255,6 +264,62 @@ public class DetailActivity extends AppCompatActivity {
         // Movie movie = movieList.get(position);
         intent.putExtra("movie", this.movie);
         startActivity(intent);
+    }
+
+    public void populateTrailers(){
+        //TrailersRecyclerViewAdapter
+
+        new fetchTrailersTask().execute();
+    }
+
+    public class fetchTrailersTask extends AsyncTask<String,Integer,List<Trailer>>{
+
+        @Override
+        protected List<Trailer> doInBackground(String... strings) {
+
+            trailerList =  new ArrayList(0);
+
+            trailerList = loadTrailers();
+
+            return trailerList;
+        }
+
+        @Override
+        public void onPostExecute(List<Trailer> trailers){
+            if(trailers != null ){
+                RecyclerView recyclerView =  findViewById(R.id.trailers_recylerview);
+
+                final LinearLayoutManager linearLayoutManager =  new LinearLayoutManager(DetailActivity.this);
+
+                recyclerView.setLayoutManager(linearLayoutManager);
+
+                adapter =  new TrailersRecyclerViewAdapter(DetailActivity.this,trailers,trailers.size());
+
+                recyclerView.setAdapter(adapter);
+            }
+        }
+    }
+
+    public List<Trailer> loadTrailers(){
+
+        URL url = NetworkUtils.buildTrailersUrl(DetailActivity.this,movieId,1);
+
+        try {
+            try {
+                String trailersJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+                trailerList.addAll(
+                        Arrays.asList(JsonUtils.getTrailersFromJson(DetailActivity.this, trailersJsonString)));
+
+                this.movie.setTrailers(trailerList);
+            } catch(FileNotFoundException fnfe){
+                Log.i(TAG, "Empty Results.");
+            }
+        } catch (IOException ioe) {
+            Log.i(TAG, ioe.getMessage());
+        } catch (JSONException jse) {
+            Log.i(TAG, jse.getMessage());
+        }
+        return trailerList;
     }
 
 
