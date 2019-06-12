@@ -38,7 +38,7 @@ public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecy
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Review review = reviews.get(position);
 
-        holder.mIdTextView.setText(review.getId());
+        //holder.mIdTextView.setText(review.getId());
 
         holder.mAuthorTextView.setText(review.getAuthor());
 
@@ -62,7 +62,7 @@ public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecy
         ViewHolder(View itemView){
             super(itemView);
 
-            mIdTextView = itemView.findViewById(R.id.review_id);
+           // mIdTextView = itemView.findViewById(R.id.review_id);
 
             mAuthorTextView = itemView.findViewById(R.id.review_author);
 

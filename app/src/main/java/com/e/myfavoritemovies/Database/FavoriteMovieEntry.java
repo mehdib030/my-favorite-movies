@@ -11,19 +11,21 @@ public class FavoriteMovieEntry {
     private int id;
 
     private String movieId;
-
     private String title;
+    private boolean favorite;
 
-    public FavoriteMovieEntry(int id, String title, String movieId){
+    public FavoriteMovieEntry(int id, String title, String movieId,boolean favorite){
         this.id=id;
         this.title=title;
         this.movieId=movieId;
+        this.favorite=favorite;
     }
 
     @Ignore
-    public FavoriteMovieEntry(String title,String movieId){
+    public FavoriteMovieEntry(String title,String movieId,boolean favorite){
         this.title=title;
         this.movieId=movieId;
+        this.favorite=favorite;
     }
 
     public String getTitle() {
@@ -48,6 +50,15 @@ public class FavoriteMovieEntry {
 
     public void setMovieId(String movieId) {
         this.movieId = movieId;
+    }
+
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 
 }

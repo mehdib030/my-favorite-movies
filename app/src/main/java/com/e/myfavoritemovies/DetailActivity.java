@@ -153,7 +153,7 @@ public class DetailActivity extends AppCompatActivity {
         String title=movie.getOriginalTitle();
         String id = movie.getId();
 
-        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id);
+        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id,true);
 
         System.out.println("Saving favorite movie : "+title+", id : "+id);
 
@@ -169,7 +169,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 while(it.hasNext()){
                     FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
-                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId());
+                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId()+" , State : "+fav.isFavorite());
                 }
                 //finish();
             }
@@ -183,7 +183,7 @@ public class DetailActivity extends AppCompatActivity {
         String title=movie.getOriginalTitle();
         final String id = movie.getId();
 
-        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id);
+        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id,false);
 
         System.out.println("Removing favorite movie : "+title+", id : "+id);
 
@@ -199,7 +199,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 while(it.hasNext()){
                     FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
-                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId());
+                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId()+" , State : "+fav.isFavorite());
                 }
             }
         });
@@ -219,18 +219,13 @@ public class DetailActivity extends AppCompatActivity {
         protected List<Review> doInBackground(String... strings) {
 
             reviewList= new ArrayList();
-
             reviewList = loadReviews();
-
-            Review[] reviews = new Review[reviewList.size()];
-            Log.i(TAG, "Reviews LENGTH : "+reviews.length);
-
             return reviewList;
 
         }
         @Override
         public void onPostExecute(List<Review> reviews){
-            reviewList.addAll(reviews);
+                reviewList.addAll(reviews);
         }
     }
 
@@ -267,8 +262,6 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     public void populateTrailers(){
-        //TrailersRecyclerViewAdapter
-
         new fetchTrailersTask().execute();
     }
 
@@ -293,7 +286,16 @@ public class DetailActivity extends AppCompatActivity {
 
                 recyclerView.setLayoutManager(linearLayoutManager);
 
-                adapter =  new TrailersRecyclerViewAdapter(DetailActivity.this,trailers,trailers.size());
+                adapter =  new TrailersRecyclerViewAdapter(DetailActivity.this,trailers,trailers.size(),new TrailersRecyclerViewAdapter.BtnClickListener() {
+
+                    @Override
+                    public void onBtnClick(int position) {
+                        // TODO Auto-generated method stub
+                    }
+
+                });
+
+
 
                 recyclerView.setAdapter(adapter);
             }

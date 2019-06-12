@@ -13,6 +13,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".DetailActivity"></activity>
         <activity android:name=".ReviewsActivity"></activity>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
