@@ -1,8 +1,11 @@
 package com.e.myfavoritemovies;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.persistence.room.util.StringUtil;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
@@ -111,15 +114,18 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                     switch(item.toString()) {
                         case "Popular":
                             movieType = POPULAR_MOVIES;
+                            loadMoviesData();
                             break;
                         case "Top Rated":
                             movieType = TOP_RATED_MOVIES;
+                            loadMoviesData();
                             break;
                         case "Favorites":
                             movieType =FAVORITES;
+                            loadFavoriteMovies();
                             break;
                     }
-                    loadMoviesData();
+                //loadMoviesData();
                 }
             }
 
@@ -219,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     }
 
 
-    public void fectchMoviesFromDatatabase(){
+    /*public void fectchMoviesFromDatatabase(){
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
 
             @Override
@@ -230,43 +236,56 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
             }
         });
 
-    }
+    }*/
     /**
      * Loads the favorite movies. The movies are retrieved one at a time by id.
      */
     public void loadFavoriteMovies() {
 
-        List<FavoriteMovieEntry> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
-        favoriteMovies.addAll(favoriteMoviesEntries);
+        final LiveData<List<FavoriteMovieEntry>> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
 
-            if (!favoriteMovies.isEmpty()){
+        favoriteMoviesEntries.observe(this, new Observer<List<FavoriteMovieEntry>>(){
 
-                Iterator<FavoriteMovieEntry> it = favoriteMovies.iterator();
-                while(it.hasNext()){
-                    FavoriteMovieEntry fme = it.next();
-                    Log.i(TAG, "Id : " + fme.getMovieId() + ", Title : " + fme.getTitle());
+            @Override
+            public void onChanged(@Nullable List<FavoriteMovieEntry> favoriteMovieEntries) {
+                //favoriteMovies.addAll(favoriteMovieEntries);
+                List<Movie> favoriteList =  new ArrayList();
+                if (!favoriteMovieEntries.isEmpty()){
 
-                    String id = fme.getMovieId();
+                    Iterator<FavoriteMovieEntry> it = favoriteMovieEntries.iterator();
+                    while(it.hasNext()){
+                        FavoriteMovieEntry fme = it.next();
+                        Log.i(TAG, "Id : " + fme.getMovieId() + ", Title : " + fme.getTitle());
 
-                    if(id != null) {
+                        String id = fme.getMovieId();
 
-                        URL url = NetworkUtils.buildUrl(MainActivity.this, movieType, 1, true, id);
+                        if(id != null) {
 
-                        try {
-                            try {
-                                String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
-                                movieList.add(JsonUtils.getFavoriteMovieTitlesFromJson(MainActivity.this, moviesJsonString));
-                            } catch (FileNotFoundException fnfe) {
-                                Log.i(TAG, "Empty Results.");
+                            Movie movie = getFavoriteMovies(id);
+
+                            if(movie != null){
+                                favoriteList.add(movie);
                             }
-                        } catch (IOException ioe) {
-                            Log.i(TAG, ioe.getMessage());
-                        } catch (JSONException jse) {
-                            Log.i(TAG, jse.getMessage());
-                        }
 
+
+
+                            /*URL url = NetworkUtils.buildUrl(MainActivity.this, movieType, 1, true, id);
+
+                            try {
+                                try {
+                                    String moviesJsonString = NetworkUtils.getResponseFromHttpUrl(url);
+                                    movieList.add(JsonUtils.getFavoriteMovieTitlesFromJson(MainActivity.this, moviesJsonString));
+                                } catch (FileNotFoundException fnfe) {
+                                    Log.i(TAG, "Empty Results.");
+                                }
+                            } catch (IOException ioe) {
+                                Log.i(TAG, ioe.getMessage());
+                            } catch (JSONException jse) {
+                                Log.i(TAG, jse.getMessage());
+                            }
+*/
+                        }
                     }
-                }
 
                 /*runOnUiThread(new Runnable() {
                     @Override
@@ -275,7 +294,50 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                         mAdapter.setMovies  (movieList);
                     }
                 });*/
+                }
+
+                //Movie[] movies = favoriteList.toArray();
+
+                Movie[] movies = new Movie[favoriteList.size()];
+                Log.i(TAG, "MOVIES LENGTH : "+movies.length);
+                Movie[] favs = favoriteList.toArray(movies);
+
+                if (favs != null){
+
+                    RecyclerView recyclerView = findViewById(R.id.movies_recylerview);
+
+                    final GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,4);
+
+                    recyclerView.setLayoutManager(gridLayoutManager);
+
+                    adapter = new MoviesRecyclerViewAdapter(MainActivity.this,favs,favs.length);
+
+                    adapter.setClickListener(MainActivity.this);
+
+                    recyclerView.setAdapter(adapter);
+                }
             }
+        });
+
+
+    }
+
+    public Movie getFavoriteMovies(String id){
+
+        if(movieList != null) {
+            Iterator<Movie> it  = movieList.iterator();
+
+            while(it.hasNext()){
+                Movie movie = it.next();
+
+                if(id.equals(movie.getId())){
+                    return movie;
+                }
+            }
+        }
+
+        return null;
+
     }
 
 

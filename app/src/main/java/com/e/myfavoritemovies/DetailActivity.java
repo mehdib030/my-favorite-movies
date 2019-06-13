@@ -1,5 +1,6 @@
 package com.e.myfavoritemovies;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -103,6 +104,8 @@ public class DetailActivity extends AppCompatActivity {
 
         AppCompatButton favoriteMoviesButton = findViewById(R.id.favorite_movie_button);
 
+        favoriteMoviesButton.setText(MARK_AS_FAVORITE);
+
         favoriteMoviesButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -163,14 +166,14 @@ public class DetailActivity extends AppCompatActivity {
             public void run() {
                 fmdb.favoriteMovieDao().insertFavoriteMovie(favoriteMovieEntry);
 
-                List<FavoriteMovieEntry> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+               /* LiveData<List<FavoriteMovieEntry>> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
 
                 Iterator it = favs.iterator();
 
                 while(it.hasNext()){
                     FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
                     System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId()+" , State : "+fav.isFavorite());
-                }
+                }*/
                 //finish();
             }
         });
@@ -193,14 +196,14 @@ public class DetailActivity extends AppCompatActivity {
             public void run() {
                 fmdb.favoriteMovieDao().deleteFavoriteMovieById(id);
 
-                List<FavoriteMovieEntry> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
+               /* List<FavoriteMovieEntry> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
 
                 Iterator it = favs.iterator();
 
                 while(it.hasNext()){
                     FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
                     System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId()+" , State : "+fav.isFavorite());
-                }
+                }*/
             }
         });
 
