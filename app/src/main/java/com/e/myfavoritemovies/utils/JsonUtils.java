@@ -39,15 +39,9 @@ public class JsonUtils {
     public static Movie[] getMovieTitlesFromJson(Context context, String jsonResponse) throws JSONException {
 
         Movie[] parsedMovieTitles=null;
-
         JSONObject movieJson =  new JSONObject(jsonResponse);
-
         final String MOVIE_RESULTS = "results";
-
-        final String MOVIE_TOTAL_RESULTS="total_results";
-
         final String MOVIE_MESSAGE_CODE = "cod";
-
 
         if(movieJson.has(MOVIE_MESSAGE_CODE)){
 
@@ -67,7 +61,6 @@ public class JsonUtils {
         }
 
         JSONArray movieArray = movieJson.getJSONArray(MOVIE_RESULTS);
-
         parsedMovieTitles = new Movie[movieArray.length()];
 
         if(movieArray != null){
@@ -112,26 +105,10 @@ public class JsonUtils {
                 default:
                     return null;
             }
-
-
         }
 
-        //JSONArray movieArray = movieJson.getJSONArray(MOVIE_RESULTS);
-
-        //parsedMovieTitles = new Movie[movieArray.length()];
-
-       /* if(movieArray != null){
-
-            for(int i=0;i < movieArray.length();i++){
-
-                JSONObject jsonMovie = movieArray.getJSONObject(i);*/
-
-                Movie movie = mapJsonObjectToMovie(movieJson);
-
-                //parsedMovieTitles[i]=movie;
-
-            //}
-       // }
+        Movie movie = mapJsonObjectToMovie(movieJson);
+        movie.setFavorite(true);
 
         return movie;
     }
@@ -146,6 +123,7 @@ public class JsonUtils {
             movie.setPlotSynopsis(jsonMovie.getString(MOVIE_OVERVIEW));
             movie.setRating(jsonMovie.getString(MOVIE_RATING));
             movie.setReleaseDate(DateUtils.formatDate(jsonMovie.getString(MOVIE_RELEASE_DATE)));
+            //movie.setFavorite(true);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -167,7 +145,7 @@ public class JsonUtils {
                 try {
                     listdata.add(jsonArray.getString(i));
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }
@@ -265,8 +243,6 @@ public class JsonUtils {
                 default:
                     return null;
             }
-
-
         }
 
         JSONArray trailerArray = trailerJson.getJSONArray(TRAILER_RESULTS);

@@ -1,5 +1,8 @@
 package com.e.myfavoritemovies.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.List;
  * user rating (called vote_average in the api)
  * release date
  */
-public class Movie implements Serializable {
+public class Movie implements Parcelable {
 
     private String id;
     private String originalTitle;
@@ -20,6 +23,7 @@ public class Movie implements Serializable {
     private String plotSynopsis;
     private String rating;
     private String releaseDate;
+    private boolean favorite;
 
     private List<Review> reviews = new ArrayList();
     private List<Trailer> trailers = new ArrayList();
@@ -34,6 +38,28 @@ public class Movie implements Serializable {
         this.rating=rating;
         this.releaseDate=releaseDate;
     }
+
+    protected Movie(Parcel in) {
+        id = in.readString();
+        originalTitle = in.readString();
+        image = in.readString();
+        plotSynopsis = in.readString();
+        rating = in.readString();
+        releaseDate = in.readString();
+        favorite = in.readByte() != 0;
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     public String getId() {
         return id;
@@ -83,6 +109,16 @@ public class Movie implements Serializable {
         this.releaseDate = releaseDate;
     }
 
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+
+
     public List<Review> getReviews() {
         return reviews;
     }
@@ -100,4 +136,19 @@ public class Movie implements Serializable {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(originalTitle);
+        parcel.writeString(image);
+        parcel.writeString(plotSynopsis);
+        parcel.writeString(rating);
+        parcel.writeString(releaseDate);
+        parcel.writeByte((byte) (favorite ? 1 : 0));
+    }
 }

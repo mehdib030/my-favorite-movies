@@ -94,17 +94,17 @@ public class DetailActivity extends AppCompatActivity {
 
         this.movieId = movie.getId();
 
-        //new FetchReviewsTask().execute();
-
-       // final Movie movieWithReviews = this.movie;
-
         populateUI(movie);
 
         Picasso.get().load(BASE_URL +movie.getImage()).into(mMovieImageView);
 
         AppCompatButton favoriteMoviesButton = findViewById(R.id.favorite_movie_button);
 
-        favoriteMoviesButton.setText(MARK_AS_FAVORITE);
+        if(movie.isFavorite()) {
+            favoriteMoviesButton.setText(REMOVE_AS_FAVORITE);
+        } else {
+            favoriteMoviesButton.setText(MARK_AS_FAVORITE);
+        }
 
         favoriteMoviesButton.setOnClickListener(new View.OnClickListener(){
 
@@ -156,7 +156,7 @@ public class DetailActivity extends AppCompatActivity {
         String title=movie.getOriginalTitle();
         String id = movie.getId();
 
-        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id,true);
+        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id);
 
         System.out.println("Saving favorite movie : "+title+", id : "+id);
 
@@ -165,16 +165,6 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 fmdb.favoriteMovieDao().insertFavoriteMovie(favoriteMovieEntry);
-
-               /* LiveData<List<FavoriteMovieEntry>> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
-
-                Iterator it = favs.iterator();
-
-                while(it.hasNext()){
-                    FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
-                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId()+" , State : "+fav.isFavorite());
-                }*/
-                //finish();
             }
         });
 
@@ -186,8 +176,6 @@ public class DetailActivity extends AppCompatActivity {
         String title=movie.getOriginalTitle();
         final String id = movie.getId();
 
-        final FavoriteMovieEntry favoriteMovieEntry = new FavoriteMovieEntry(title,id,false);
-
         System.out.println("Removing favorite movie : "+title+", id : "+id);
 
         AppExecutors.getInstance().diskIO().execute(new Runnable(){
@@ -195,15 +183,6 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 fmdb.favoriteMovieDao().deleteFavoriteMovieById(id);
-
-               /* List<FavoriteMovieEntry> favs = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
-
-                Iterator it = favs.iterator();
-
-                while(it.hasNext()){
-                    FavoriteMovieEntry fav = (FavoriteMovieEntry) it.next();
-                    System.out.println(" FAV : "+fav.getTitle()+", id : "+fav.getMovieId()+" , State : "+fav.isFavorite());
-                }*/
             }
         });
 
@@ -328,4 +307,10 @@ public class DetailActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.i(TAG,"ON SAVE INSTANCE STATE DETAILS");
+    }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 @Dao
 public interface FavoriteMovieDao {
 
-    @Query("SELECT * From FavoriteMovie where favorite = 1 ")
+    @Query("SELECT * From FavoriteMovie")
     LiveData<List<FavoriteMovieEntry>> loadAllFavoriteMovies();
 
     @Insert

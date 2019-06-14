@@ -52,14 +52,12 @@ public class ReviewsActivity extends AppCompatActivity implements ReviewsRecycle
             closeOnError();
         }
 
-        Movie movie = (Movie)intent.getSerializableExtra("movie");
+        Movie movie = (Movie)intent.getParcelableExtra("movie");
         this.movie = movie;
 
         this.movieId = movie.getId();
 
         new ReviewsActivity.FetchReviewsTask().execute();
-
-
 
     }
 

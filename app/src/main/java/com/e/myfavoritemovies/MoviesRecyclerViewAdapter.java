@@ -18,13 +18,13 @@ import java.util.List;
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.ViewHolder> {
 
     private int mNumberOfItems;
-    private Movie[] movies;
+    private List<Movie> movies;
     private LayoutInflater mLayoutInflater;
     private ItemClickListener mItemClickListener;
     private Context context;
 
 
-    public MoviesRecyclerViewAdapter(Context context, Movie[] movies,int numberOfItems){
+    public MoviesRecyclerViewAdapter(Context context, List<Movie> movies,int numberOfItems){
           this.mLayoutInflater =  LayoutInflater.from(context);
           this.movies=movies;
           this.mNumberOfItems=numberOfItems;
@@ -42,11 +42,12 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Movie movie = movies[position];
 
-        if (movie != null) {
-            Picasso.get().load(this.context.getString(R.string.image_base_url)+ movie.getImage()).into(holder.mMovieImageView);
-        }
+            Movie movie = movies.get(position);
+
+            if (movie != null) {
+                Picasso.get().load(this.context.getString(R.string.image_base_url)+ movie.getImage()).into(holder.mMovieImageView);
+            }
     }
 
     @Override
@@ -55,7 +56,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     }
 
     public String getItem(int id){
-        return movies[id].getOriginalTitle();
+        return movies.get(id).getOriginalTitle();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -82,7 +83,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     }
 
     public void setMovies(List<Movie> movies){
-        this.movies = movies.toArray(new Movie[movies.size()]);
+        this.movies = movies;
         notifyDataSetChanged();
     }
 }
