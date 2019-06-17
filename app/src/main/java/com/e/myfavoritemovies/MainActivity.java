@@ -2,15 +2,18 @@ package com.e.myfavoritemovies;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.arch.persistence.room.util.StringUtil;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -48,6 +51,9 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     private static final String LIFECYCLE_CALLBACKS_MOVIES = "moviesCallback";
     private static final String LIFECYCLE_CALLBACKS_MOVIE_TYPE = "movieTypeCallback";
     private static final String LIFECYCLE_CALLBACKS_MENU = "menuCallBack";
+    private static final String BUNDLE_RECYCLER_LAYOUT = "recyclerLayout";
+    private static final String LAYOUT_MANAGER = "recyclerLayoutManager";
+    private static final String SCROLL_POSITION = "recyclerLayout";
 
     private MoviesRecyclerViewAdapter adapter;
 
@@ -59,10 +65,12 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     private AppDatabase fmdb;
 
-    private Menu menu;
-
     private boolean inflateMenu=true;
 
+    private RecyclerView recyclerView;
+
+    int mScrollPosition;
+    Parcelable savedRecyclerLayoutState;
 
 
     @Override
@@ -75,9 +83,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                 movieList = savedInstanceState
                         .getParcelableArrayList(LIFECYCLE_CALLBACKS_MOVIES);
 
-
                 Log.i(TAG,"ON CREATE SAVED INSTANCE");
-                //mLifecycleDisplay.setText(allPreviousLifecycleCallbacks);
             }
 
             if (savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_MOVIE_TYPE)) {
@@ -88,31 +94,30 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
             if(savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_MENU)){
                 inflateMenu=false;
             }
+
         }
 
         fmdb = AppDatabase.getInstance(getApplicationContext());
+
     }
 
     private void launchDetailActivity(int position) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_POSITION,position);
         intent.putExtra("movies", (ArrayList<Movie>)movieList);
-       // Movie movie = movieList.get(position);
-        //intent.putExtra("movie", movieList.get(position));
         startActivity(intent);
     }
 
     public void loadMoviesData(){
 
-        final LiveData<List<FavoriteMovieEntry>> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
 
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         final List<Movie> favoriteList =  new ArrayList();
 
-        favoriteMoviesEntries.observe(this, new Observer<List<FavoriteMovieEntry>>(){
+        viewModel.getFavoriteMovies().observe(this, new Observer<List<FavoriteMovieEntry>>(){
 
             @Override
             public void onChanged(@Nullable List<FavoriteMovieEntry> favoriteMovieEntries) {
-                //new FetchFavoriteMoviesTask(favoriteMovieEntries).execute();
                 new FetchMoviesTask(favoriteMovieEntries).execute();
 
             }
@@ -130,10 +135,14 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
         if(savedInstanceState != null){
-
+            recyclerView = findViewById(R.id.movies_recylerview);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
         }
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -149,8 +158,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
                 public void onItemSelected(AdapterView<?> adapterView, View view,
                                            int position, long id) {
                     Object item = adapterView.getItemAtPosition(position);
-
-
 
                     if (item != null) {
                         Toast.makeText(MainActivity.this, item.toString(),
@@ -224,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         public void onPostExecute(List<Movie> moviesData){
 
             if (moviesData != null){
-                RecyclerView recyclerView = findViewById(R.id.movies_recylerview);
+                recyclerView = findViewById(R.id.movies_recylerview);
                 final GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,4);
                 recyclerView.setLayoutManager(gridLayoutManager);
                 adapter = new MoviesRecyclerViewAdapter(MainActivity.this,moviesData,moviesData.size());
@@ -277,19 +284,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     @Override
     protected void onResume(){
         super.onResume();
-       // if(movieType == FAVORITES) {
-            //loadFavoriteMovies();
-
-           /* runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.i(TAG, "SETTING ADAPTER "+movieList.size());
-                    adapter.setMovies(movieList);
-                }
-            });*/
-
-       // }
-
     }
 
     /**
@@ -297,11 +291,10 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
      */
     public List<Movie>  loadFavoriteMovies() {
 
-        final LiveData<List<FavoriteMovieEntry>> favoriteMoviesEntries  = fmdb.favoriteMovieDao().loadAllFavoriteMovies();
-
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         final List<Movie> favoriteList =  new ArrayList();
 
-        favoriteMoviesEntries.observe(this, new Observer<List<FavoriteMovieEntry>>(){
+        viewModel.getFavoriteMovies().observe(this, new Observer<List<FavoriteMovieEntry>>(){
 
             @Override
             public void onChanged(@Nullable List<FavoriteMovieEntry> favoriteMovieEntries) {
@@ -358,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         public void onPostExecute(List<Movie> favoriteList){
             if (favoriteList.size() > 0){
 
-                RecyclerView recyclerView = findViewById(R.id.movies_recylerview);
+                recyclerView = findViewById(R.id.movies_recylerview);
                 final GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,4);
                 recyclerView.setLayoutManager(gridLayoutManager);
                 adapter = new MoviesRecyclerViewAdapter(MainActivity.this,favoriteList,favoriteList.size());
@@ -368,8 +361,11 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         }
     }
 
+
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        //Parcelable superState = super.onSaveInstanceState();
         super.onSaveInstanceState(outState);
         Log.i(TAG,"ON SAVE INSTANCE STATE MAIN ACTIVITY");
 
@@ -378,5 +374,11 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
         outState.putParcelableArrayList(LIFECYCLE_CALLBACKS_MOVIES, (ArrayList<? extends Parcelable>) movieList);
 
         outState.putBoolean(LIFECYCLE_CALLBACKS_MENU, false);
+
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+
     }
+
+
+
 }

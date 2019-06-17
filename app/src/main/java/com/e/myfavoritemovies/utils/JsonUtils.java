@@ -80,14 +80,7 @@ public class JsonUtils {
     }
 
     public static Movie getFavoriteMovieTitlesFromJson(Context context, String jsonResponse) throws JSONException {
-
-        Movie[] parsedMovieTitles=null;
-
         JSONObject movieJson =  new JSONObject(jsonResponse);
-
-        final String MOVIE_RESULTS = "results";
-
-        final String MOVIE_TOTAL_RESULTS="total_results";
 
         final String MOVIE_MESSAGE_CODE = "cod";
 
@@ -123,7 +116,6 @@ public class JsonUtils {
             movie.setPlotSynopsis(jsonMovie.getString(MOVIE_OVERVIEW));
             movie.setRating(jsonMovie.getString(MOVIE_RATING));
             movie.setReleaseDate(DateUtils.formatDate(jsonMovie.getString(MOVIE_RELEASE_DATE)));
-            //movie.setFavorite(true);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -224,8 +216,6 @@ public class JsonUtils {
         JSONObject trailerJson =  new JSONObject(jsonResponse);
 
         final String TRAILER_RESULTS = "results";
-
-        final String TRAILER_TOTAL_RESULTS="total_results";
 
         final String MOVIE_MESSAGE_CODE = "cod";
 

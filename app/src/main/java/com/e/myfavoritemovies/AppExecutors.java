@@ -29,7 +29,6 @@ public class AppExecutors {
                         new MainThreadExecutor());
 
             }
-
         }
 
         return sInstance;

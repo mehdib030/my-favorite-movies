@@ -1,9 +1,19 @@
 <resources>
     <string name="app_name">My Favorite Movies</string>
-    <string name="api_key_value">2830d7b62b683f28c1c092afbea0196e</string>
+    <string name="api_key_value"></string>
     <string name="base_url">http://api.themoviedb.org/3/movie/</string>
     <string name="image_base_url">http://image.tmdb.org/t/p/w185//</string>n
     <string name="favorite_movie_value">MARK AS FAVORITE</string>
+    <string name="remove_favorite_movie_value">REMOVE AS FAVORITE</string>
     <string name="movie_reviews_value">Movie Reviews</string>
+    <string name="movie_details_not_available">Movie data not available.</string>
+    <string name="movie_reviews_title">Reviews:</string>
+    <string name="movie_review_url">Url:</string>
+    <string name="movie_review_author">Author:</string>
+    <string name="movie_trailers_title">Trailers:</string>
+    <string name="movie_details_release_date_title">Release Date:</string>
+    <string name="movie_details_rating_title">Rating:</string>
+    <string name="movie_details_plot_synopsis_title">Plot Synopsis:</string>
+    <string name="movie_details_original_title">Original Title:</string>
 
 </resources>

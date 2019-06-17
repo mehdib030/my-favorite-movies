@@ -7,66 +7,47 @@
     tools:context=".ReviewsActivity"
     >
 
-
-   <!-- <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">-->
-       <!--<FrameLayout
+        <TextView
+            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">-->
+            android:text="@string/movie_review_author"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:id="@+id/review_author"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            />
 
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/movie_reviews_title"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:id="@+id/review_content"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            />
 
-           <!--<TextView
-               android:id="@+id/review_id"
-               android:layout_height="wrap_content"
-               android:layout_width="wrap_content"
-               />-->
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/movie_review_url"
+            android:textStyle="bold"
+            />
 
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="Author:"
-                android:textStyle="bold"
-                />
-            <TextView
-                android:id="@+id/review_author"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                />
+        <TextView
+            android:id="@+id/review_url"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            />
 
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="Review:"
-                android:textStyle="bold"
-                />
-            <TextView
-                android:id="@+id/review_content"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                />
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="Url:"
-                android:textStyle="bold"
-                />
-
-            <TextView
-                android:id="@+id/review_url"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                />
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="2dp"
-                android:background="#c0c0c0"/>
-    <!-- </FrameLayout>-->
-
-   <!-- </ScrollView>-->
-
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/layout_height"
+            android:background="#c0c0c0"/>
 
 
 </LinearLayout>

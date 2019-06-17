@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 public class Review implements Serializable {
 
-
-
     private String id;
     private String author;
     private String content;

@@ -17,10 +17,6 @@ public class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
-   // private static final String BASE_URL = "http://api.themoviedb.org/3/movie/"; //TODO: move to properties file
-
-    //private static final String API_KEY_VALUE = "2830d7b62b683f28c1c092afbea0196e"; //TODO:move to properties file
-
     private static final String API_KEY_NAME="api_key";
 
 
