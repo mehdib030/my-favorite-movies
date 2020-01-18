@@ -39,7 +39,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-
+/**
+ * This class is the main entry point for the app, it fetches and displays a list of movies.
+ * It also displays a menu for selecting popular and top rated movies.
+ */
 public class MainActivity extends AppCompatActivity implements MoviesRecyclerViewAdapter.ItemClickListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
