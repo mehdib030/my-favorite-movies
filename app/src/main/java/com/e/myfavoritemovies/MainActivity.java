@@ -1,17 +1,13 @@
 package com.e.myfavoritemovies;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.util.StringUtil;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Parcel;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,16 +23,16 @@ import android.widget.Toast;
 import com.e.myfavoritemovies.Database.AppDatabase;
 import com.e.myfavoritemovies.Database.FavoriteMovieEntry;
 import com.e.myfavoritemovies.model.Movie;
-import com.e.myfavoritemovies.model.Review;
 import com.e.myfavoritemovies.utils.JsonUtils;
 import com.e.myfavoritemovies.utils.NetworkUtils;
+
 import org.json.JSONException;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -55,8 +51,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
     private static final String LIFECYCLE_CALLBACKS_MOVIE_TYPE = "movieTypeCallback";
     private static final String LIFECYCLE_CALLBACKS_MENU = "menuCallBack";
     private static final String BUNDLE_RECYCLER_LAYOUT = "recyclerLayout";
-    private static final String LAYOUT_MANAGER = "recyclerLayoutManager";
-    private static final String SCROLL_POSITION = "recyclerLayout";
 
     private MoviesRecyclerViewAdapter adapter;
 
@@ -72,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     private RecyclerView recyclerView;
 
-    int mScrollPosition;
     Parcelable savedRecyclerLayoutState;
 
 
@@ -115,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
 
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        final List<Movie> favoriteList =  new ArrayList();
 
         viewModel.getFavoriteMovies().observe(this, new Observer<List<FavoriteMovieEntry>>(){
 
@@ -368,7 +360,6 @@ public class MainActivity extends AppCompatActivity implements MoviesRecyclerVie
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        //Parcelable superState = super.onSaveInstanceState();
         super.onSaveInstanceState(outState);
         Log.i(TAG,"ON SAVE INSTANCE STATE MAIN ACTIVITY");
 
