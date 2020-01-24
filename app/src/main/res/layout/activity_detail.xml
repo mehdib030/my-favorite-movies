@@ -89,11 +89,6 @@
                     android:text="@string/movie_trailers_title"
                     android:textStyle="bold" />
 
-               <!-- <include
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout="@layout/trailers_recylerview" />-->
-
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/trailers_recylerview"
                     android:layout_width="match_parent"
