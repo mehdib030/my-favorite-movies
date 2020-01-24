@@ -127,8 +127,6 @@ public class ReviewsActivity extends AppCompatActivity implements ReviewsRecycle
 
             adapter = new ReviewsRecyclerViewAdapter(ReviewsActivity.this,reviewList,reviewList.size());
 
-            //adapter.setClickListener(ReviewsActivity.this);
-
             recyclerView.setAdapter(adapter);
         } else {
             Toast.makeText(this,"Movie reviews not available.",Toast.LENGTH_SHORT);

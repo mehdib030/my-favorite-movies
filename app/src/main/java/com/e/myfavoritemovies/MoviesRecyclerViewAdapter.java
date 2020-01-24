@@ -82,8 +82,4 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         void onItemClick(View view, int position);
     }
 
-    public void setMovies(List<Movie> movies){
-        this.movies = movies;
-        notifyDataSetChanged();
-    }
 }
