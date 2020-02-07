@@ -52,7 +52,6 @@ public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecy
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView mIdTextView;
         TextView mAuthorTextView;
         TextView mContentTextView;
         TextView mUrlTextView;
