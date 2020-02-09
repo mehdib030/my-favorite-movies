@@ -160,8 +160,6 @@ public class JsonUtils {
 
         final String REVIEW_RESULTS = "results";
 
-        final String REVIEW_TOTAL_RESULTS="total_results";
-
         final String MOVIE_MESSAGE_CODE = "cod";
 
 
