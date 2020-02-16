@@ -28,11 +28,7 @@ public class FavoriteMovieEntry {
     public String getTitle() {
         return title;
     }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
+    
     public int getId() {
         return id;
     }
@@ -43,10 +39,6 @@ public class FavoriteMovieEntry {
 
     public String getMovieId() {
         return movieId;
-    }
-
-    public void setMovieId(String movieId) {
-        this.movieId = movieId;
     }
 
 }
