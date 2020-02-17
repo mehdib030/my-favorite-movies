@@ -31,7 +31,7 @@ public class NetworkUtils {
      */
     public static URL buildUrl(Context context, String movieType, int page, boolean favoriteMovies, String id){
 
-        Uri builtUri=null;
+        Uri builtUri;
 
          Uri.Builder builder = Uri.parse(context.getString(R.string.base_url)).buildUpon();
 

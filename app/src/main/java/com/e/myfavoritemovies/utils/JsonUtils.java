@@ -1,6 +1,7 @@
 package com.e.myfavoritemovies.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.e.myfavoritemovies.model.Movie;
 import com.e.myfavoritemovies.model.Review;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JsonUtils {
+
+    private static final String TAG = JsonUtils.class.getSimpleName();
 
     private static final String MOVIE_ID="id";
     private static final String MOVIE_POSTER="poster_path";
@@ -38,7 +41,7 @@ public class JsonUtils {
 
     public static Movie[] getMovieTitlesFromJson(Context context, String jsonResponse) throws JSONException {
 
-        Movie[] parsedMovieTitles=null;
+        Movie[] parsedMovieTitles;
         JSONObject movieJson =  new JSONObject(jsonResponse);
         final String MOVIE_RESULTS = "results";
         final String MOVIE_MESSAGE_CODE = "cod";
@@ -137,7 +140,7 @@ public class JsonUtils {
                 try {
                     listdata.add(jsonArray.getString(i));
                 } catch (JSONException e) {
-                    //e.printStackTrace();
+                    Log.v(TAG, "Convert JSON to List Exception "+e.getMessage());
                 }
             }
         }

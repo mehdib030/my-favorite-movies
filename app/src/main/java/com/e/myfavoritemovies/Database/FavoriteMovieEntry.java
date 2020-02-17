@@ -28,7 +28,7 @@ public class FavoriteMovieEntry {
     public String getTitle() {
         return title;
     }
-    
+
     public int getId() {
         return id;
     }
