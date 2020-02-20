@@ -27,7 +27,6 @@ public class DateUtils {
         }
 
         sdf.applyPattern("MMM dd yyyy");
-        System.out.println(sdf.format(d));
 
         return sdf.format(d);
    }
