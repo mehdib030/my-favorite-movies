@@ -22,7 +22,7 @@ public class TrailersRecyclerViewAdapter extends RecyclerView.Adapter<TrailersRe
     private LayoutInflater mLayoutInflater;
     private Context context;
     private BtnClickListener mClickListener = null;
-
+    
     public TrailersRecyclerViewAdapter(Context context,List<Trailer> trailers, int numberOfItems,BtnClickListener listener){
         this.context=context;
         this.trailers=trailers;
